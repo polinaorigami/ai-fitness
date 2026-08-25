@@ -1,0 +1,1625 @@
+[
+ {
+  "id": "squat_barbell",
+  "name": "Приседания со штангой",
+  "group": "legs",
+  "group_label": "Ноги",
+  "equipment": [
+   "barbell",
+   "rack"
+  ],
+  "equipment_labels": [
+   "штанга",
+   "стойка"
+  ],
+  "level": "intermediate",
+  "level_label": "Средний",
+  "sets": 4,
+  "reps": "8–10",
+  "rest_sec": 90,
+  "description": "Базовое упражнение на квадрицепсы, ягодицы и корпус.",
+  "technique": "Штанга на верхней части трапеций. Ноги на ширине плеч, носки слегка наружу. Сядь вниз, отводя таз назад, колени в сторону носков. Глубина — бедро параллельно полу или ниже. Встань, толкая пол всей стопой.",
+  "mistakes": "Колени сводятся внутрь; отрыв пяток; округление спины; неполная амплитуда.",
+  "youtube_url": "https://www.youtube.com/watch?v=VGNuRAtOQMs"
+ },
+ {
+  "id": "squat_goblet",
+  "name": "Гоблет-приседания",
+  "group": "legs",
+  "group_label": "Ноги",
+  "equipment": [
+   "dumbbell",
+   "kettlebell"
+  ],
+  "equipment_labels": [
+   "гантели",
+   "гиря"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10–12",
+  "rest_sec": 75,
+  "description": "Приседания с гантелью или гирей у груди — самый безопасный вариант для новичка.",
+  "technique": "Держи снаряд у груди обеими руками. Присядь между коленей, локти касаются внутренней части бёдер. Спина прямая, взгляд вперёд.",
+  "mistakes": "Наклон корпуса вперёд; отрыв пяток; слишком узкая постановка.",
+  "youtube_url": null
+ },
+ {
+  "id": "squat_bodyweight",
+  "name": "Приседания с собственным весом",
+  "group": "legs",
+  "group_label": "Ноги",
+  "equipment": [
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "15–20",
+  "rest_sec": 60,
+  "description": "Приседания без отягощения для дома.",
+  "technique": "Руки перед собой. Сядь назад и вниз до параллели бедра с полом, затем встань. Держи темп 2 секунды вниз — 1 вверх.",
+  "mistakes": "Колени внутрь; наклон вперёд; быстрое падение вниз.",
+  "youtube_url": null
+ },
+ {
+  "id": "leg_press",
+  "name": "Жим ногами",
+  "group": "legs",
+  "group_label": "Ноги",
+  "equipment": [
+   "machine"
+  ],
+  "equipment_labels": [
+   "тренажёры"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10–12",
+  "rest_sec": 90,
+  "description": "Тренажёр для квадрицепсов и ягодиц с минимальной нагрузкой на спину.",
+  "technique": "Стопы на ширине плеч посередине платформы. Опусти платформу до угла 90° в коленях, не отрывая поясницу от спинки. Выжми, не разгибая колени до замка.",
+  "mistakes": "Отрыв поясницы; полное выпрямление коленей; слишком короткая амплитуда.",
+  "youtube_url": null
+ },
+ {
+  "id": "lunge_walking",
+  "name": "Выпады с гантелями",
+  "group": "legs",
+  "group_label": "Ноги",
+  "equipment": [
+   "dumbbell",
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "гантели",
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10–12 на ногу",
+  "rest_sec": 75,
+  "description": "Односторонняя нагрузка на бёдра и ягодицы, улучшает баланс.",
+  "technique": "Шаг вперёд, опусти заднее колено почти до пола. Переднее колено над стопой. Оттолкнись передней ногой и вернись.",
+  "mistakes": "Слишком короткий шаг; колено уходит за носок; наклон вперёд.",
+  "youtube_url": null
+ },
+ {
+  "id": "split_squat_bulgarian",
+  "name": "Болгарские выпады",
+  "group": "legs",
+  "group_label": "Ноги",
+  "equipment": [
+   "dumbbell",
+   "bench",
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "гантели",
+   "скамья",
+   "собственный вес"
+  ],
+  "level": "intermediate",
+  "level_label": "Средний",
+  "sets": 3,
+  "reps": "8–10 на ногу",
+  "rest_sec": 75,
+  "description": "Одна нога на скамье сзади. Сильно нагружает квадрицепс и ягодицу рабочей ноги.",
+  "technique": "Задняя стопа на скамье. Опускайся вертикально, пока бедро передней ноги не станет параллельно полу. Вес на пятке передней ноги.",
+  "mistakes": "Наклон вперёд; слишком близко к скамье; колено внутрь.",
+  "youtube_url": null
+ },
+ {
+  "id": "leg_extension",
+  "name": "Разгибание ног в тренажёре",
+  "group": "legs",
+  "group_label": "Ноги",
+  "equipment": [
+   "machine"
+  ],
+  "equipment_labels": [
+   "тренажёры"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "12–15",
+  "rest_sec": 60,
+  "description": "Изолированная работа квадрицепсов.",
+  "technique": "Валик на нижней части голени. Разогни ноги полностью, задержись на секунду, опусти подконтрольно.",
+  "mistakes": "Рывки; отрыв таза от сиденья; половинная амплитуда.",
+  "youtube_url": null
+ },
+ {
+  "id": "leg_curl",
+  "name": "Сгибание ног лёжа",
+  "group": "legs",
+  "group_label": "Ноги",
+  "equipment": [
+   "machine"
+  ],
+  "equipment_labels": [
+   "тренажёры"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "12–15",
+  "rest_sec": 60,
+  "description": "Изоляция задней поверхности бедра.",
+  "technique": "Лёжа на животе, валик над пятками. Согни ноги, стараясь коснуться ягодиц, опусти медленно.",
+  "mistakes": "Отрыв таза; слишком большой вес; быстрое опускание.",
+  "youtube_url": null
+ },
+ {
+  "id": "deadlift_romanian",
+  "name": "Румынская тяга",
+  "group": "legs",
+  "group_label": "Ноги",
+  "equipment": [
+   "barbell",
+   "dumbbell"
+  ],
+  "equipment_labels": [
+   "штанга",
+   "гантели"
+  ],
+  "level": "intermediate",
+  "level_label": "Средний",
+  "sets": 4,
+  "reps": "8–10",
+  "rest_sec": 90,
+  "description": "Основное упражнение на заднюю поверхность бедра и ягодицы.",
+  "technique": "Штанга в руках, колени слегка согнуты. Отводя таз назад, опускай штангу вдоль ног до середины голени, спина прямая. Вернись за счёт ягодиц.",
+  "mistakes": "Округление спины; сгибание коленей вместо отведения таза; штанга далеко от ног.",
+  "youtube_url": null
+ },
+ {
+  "id": "calf_raise_standing",
+  "name": "Подъём на носки стоя",
+  "group": "legs",
+  "group_label": "Ноги",
+  "equipment": [
+   "bodyweight",
+   "dumbbell",
+   "machine"
+  ],
+  "equipment_labels": [
+   "собственный вес",
+   "гантели",
+   "тренажёры"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "15–20",
+  "rest_sec": 45,
+  "description": "Работа икроножных мышц.",
+  "technique": "Носки на возвышении, пятки свисают. Поднимись максимально высоко, задержись, опустись ниже уровня платформы.",
+  "mistakes": "Пружинящие движения; неполная амплитуда.",
+  "youtube_url": null
+ },
+ {
+  "id": "wall_sit",
+  "name": "Стульчик у стены",
+  "group": "legs",
+  "group_label": "Ноги",
+  "equipment": [
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "30–45 сек",
+  "rest_sec": 45,
+  "description": "Статическая нагрузка на квадрицепсы для дома.",
+  "technique": "Спина к стене, бёдра параллельно полу, колени под 90°. Удерживай положение.",
+  "mistakes": "Бёдра выше параллели; давление на колени руками.",
+  "youtube_url": null
+ },
+ {
+  "id": "hip_thrust",
+  "name": "Ягодичный мост со штангой",
+  "group": "glutes",
+  "group_label": "Ягодицы",
+  "equipment": [
+   "barbell",
+   "bench"
+  ],
+  "equipment_labels": [
+   "штанга",
+   "скамья"
+  ],
+  "level": "intermediate",
+  "level_label": "Средний",
+  "sets": 4,
+  "reps": "10–12",
+  "rest_sec": 90,
+  "description": "Самое эффективное упражнение на ягодицы.",
+  "technique": "Лопатки на скамье, штанга на тазу. Подними таз до прямой линии колено–плечо, сожми ягодицы на секунду. Подбородок к груди.",
+  "mistakes": "Переразгибание поясницы; неполный подъём; стопы слишком далеко.",
+  "youtube_url": null
+ },
+ {
+  "id": "glute_bridge",
+  "name": "Ягодичный мост лёжа",
+  "group": "glutes",
+  "group_label": "Ягодицы",
+  "equipment": [
+   "bodyweight",
+   "dumbbell"
+  ],
+  "equipment_labels": [
+   "собственный вес",
+   "гантели"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "15–20",
+  "rest_sec": 45,
+  "description": "Домашняя версия ягодичного моста.",
+  "technique": "Лёжа на спине, стопы у ягодиц. Подними таз, сжимая ягодицы, задержись на 1–2 секунды.",
+  "mistakes": "Прогиб в пояснице; толчок стопами далеко от таза.",
+  "youtube_url": null
+ },
+ {
+  "id": "hip_abduction_machine",
+  "name": "Разведение ног в тренажёре",
+  "group": "glutes",
+  "group_label": "Ягодицы",
+  "equipment": [
+   "machine"
+  ],
+  "equipment_labels": [
+   "тренажёры"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "15–20",
+  "rest_sec": 45,
+  "description": "Средняя ягодичная мышца.",
+  "technique": "Сидя, разведи ноги против сопротивления, задержись, сведи медленно.",
+  "mistakes": "Раскачка корпусом; рывки.",
+  "youtube_url": null
+ },
+ {
+  "id": "kickback_cable",
+  "name": "Отведение ноги назад в кроссовере",
+  "group": "glutes",
+  "group_label": "Ягодицы",
+  "equipment": [
+   "cable",
+   "band"
+  ],
+  "equipment_labels": [
+   "блок",
+   "резинки"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "12–15 на ногу",
+  "rest_sec": 45,
+  "description": "Изоляция большой ягодичной.",
+  "technique": "Манжета на лодыжке. Отведи прямую ногу назад, не прогибая поясницу, вернись подконтрольно.",
+  "mistakes": "Прогиб в пояснице; мах вместо контролируемого движения.",
+  "youtube_url": null
+ },
+ {
+  "id": "clamshell",
+  "name": "Ракушка с резинкой",
+  "group": "glutes",
+  "group_label": "Ягодицы",
+  "equipment": [
+   "band",
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "резинки",
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "15–20 на сторону",
+  "rest_sec": 30,
+  "description": "Активация средней ягодичной, полезно для разминки.",
+  "technique": "Лёжа на боку, колени согнуты, резинка над коленями. Раскрой верхнее колено, не поворачивая таз.",
+  "mistakes": "Поворот таза назад; быстрый темп.",
+  "youtube_url": null
+ },
+ {
+  "id": "step_up",
+  "name": "Зашагивания на возвышение",
+  "group": "glutes",
+  "group_label": "Ягодицы",
+  "equipment": [
+   "bench",
+   "dumbbell",
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "скамья",
+   "гантели",
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10–12 на ногу",
+  "rest_sec": 60,
+  "description": "Ягодицы и бёдра, доступно дома.",
+  "technique": "Поставь стопу на скамью, поднимись за счёт ноги на скамье, не отталкиваясь нижней. Опустись медленно.",
+  "mistakes": "Толчок нижней ногой; колено внутрь.",
+  "youtube_url": null
+ },
+ {
+  "id": "sumo_squat",
+  "name": "Сумо-приседания с гантелью",
+  "group": "glutes",
+  "group_label": "Ягодицы",
+  "equipment": [
+   "dumbbell",
+   "kettlebell"
+  ],
+  "equipment_labels": [
+   "гантели",
+   "гиря"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "12–15",
+  "rest_sec": 60,
+  "description": "Широкая постановка — акцент на ягодицы и внутреннюю поверхность бедра.",
+  "technique": "Ноги шире плеч, носки наружу 45°. Гантель между ног. Присядь, колени в стороны, спина прямая.",
+  "mistakes": "Колени внутрь; наклон вперёд.",
+  "youtube_url": null
+ },
+ {
+  "id": "deadlift_conventional",
+  "name": "Становая тяга",
+  "group": "back",
+  "group_label": "Спина",
+  "equipment": [
+   "barbell"
+  ],
+  "equipment_labels": [
+   "штанга"
+  ],
+  "level": "advanced",
+  "level_label": "Продвинутый",
+  "sets": 4,
+  "reps": "5–6",
+  "rest_sec": 150,
+  "description": "Тяга штанги с пола. Вся задняя цепь.",
+  "technique": "Стопы под штангой, хват чуть шире ног. Спина прямая, грудь вперёд. Толкай пол ногами, штанга скользит вдоль голеней. В верхней точке — выпрямись, не прогибаясь.",
+  "mistakes": "Округление спины; рывок; штанга далеко от ног.",
+  "youtube_url": null
+ },
+ {
+  "id": "pullup",
+  "name": "Подтягивания",
+  "group": "back",
+  "group_label": "Спина",
+  "equipment": [
+   "pullup_bar"
+  ],
+  "equipment_labels": [
+   "турник"
+  ],
+  "level": "intermediate",
+  "level_label": "Средний",
+  "sets": 4,
+  "reps": "6–10",
+  "rest_sec": 90,
+  "description": "Базовое упражнение на широчайшие.",
+  "technique": "Хват чуть шире плеч. Подтянись до подбородка над перекладиной, сводя лопатки. Опускайся полностью.",
+  "mistakes": "Раскачка; неполная амплитуда; плечи к ушам.",
+  "youtube_url": null
+ },
+ {
+  "id": "pullup_band",
+  "name": "Подтягивания с резинкой",
+  "group": "back",
+  "group_label": "Спина",
+  "equipment": [
+   "pullup_bar",
+   "band"
+  ],
+  "equipment_labels": [
+   "турник",
+   "резинки"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "8–10",
+  "rest_sec": 90,
+  "description": "Подтягивания с помощью резинки для новичков.",
+  "technique": "Резинка на перекладине, стопа в петле. Техника как в обычных подтягиваниях.",
+  "mistakes": "Рывок в нижней точке; неполное опускание.",
+  "youtube_url": null
+ },
+ {
+  "id": "lat_pulldown",
+  "name": "Тяга верхнего блока",
+  "group": "back",
+  "group_label": "Спина",
+  "equipment": [
+   "machine",
+   "cable"
+  ],
+  "equipment_labels": [
+   "тренажёры",
+   "блок"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10–12",
+  "rest_sec": 75,
+  "description": "Замена подтягиваний.",
+  "technique": "Хват широкий. Тяни рукоять к верху груди, сводя лопатки, локти вниз. Верни подконтрольно.",
+  "mistakes": "Отклонение корпуса назад; тяга за голову.",
+  "youtube_url": null
+ },
+ {
+  "id": "row_barbell",
+  "name": "Тяга штанги в наклоне",
+  "group": "back",
+  "group_label": "Спина",
+  "equipment": [
+   "barbell"
+  ],
+  "equipment_labels": [
+   "штанга"
+  ],
+  "level": "intermediate",
+  "level_label": "Средний",
+  "sets": 4,
+  "reps": "8–10",
+  "rest_sec": 90,
+  "description": "Толщина спины.",
+  "technique": "Наклон 45°, спина прямая. Тяни штангу к низу живота, локти вдоль корпуса, сведи лопатки.",
+  "mistakes": "Округление спины; рывок корпусом.",
+  "youtube_url": null
+ },
+ {
+  "id": "row_dumbbell",
+  "name": "Тяга гантели одной рукой",
+  "group": "back",
+  "group_label": "Спина",
+  "equipment": [
+   "dumbbell",
+   "bench"
+  ],
+  "equipment_labels": [
+   "гантели",
+   "скамья"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10–12 на руку",
+  "rest_sec": 60,
+  "description": "Односторонняя тяга — удобно дома.",
+  "technique": "Колено и рука на скамье, спина параллельна полу. Тяни гантель к поясу, локоть назад.",
+  "mistakes": "Разворот корпуса; тяга к плечу.",
+  "youtube_url": null
+ },
+ {
+  "id": "row_seated_cable",
+  "name": "Горизонтальная тяга блока",
+  "group": "back",
+  "group_label": "Спина",
+  "equipment": [
+   "cable",
+   "machine"
+  ],
+  "equipment_labels": [
+   "блок",
+   "тренажёры"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10–12",
+  "rest_sec": 75,
+  "description": "Средняя часть спины.",
+  "technique": "Сидя, спина прямая. Тяни рукоять к животу, сводя лопатки, грудь вперёд.",
+  "mistakes": "Наклон корпуса вперёд-назад; поднятые плечи.",
+  "youtube_url": null
+ },
+ {
+  "id": "row_band",
+  "name": "Тяга резинки сидя",
+  "group": "back",
+  "group_label": "Спина",
+  "equipment": [
+   "band"
+  ],
+  "equipment_labels": [
+   "резинки"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "15–20",
+  "rest_sec": 45,
+  "description": "Домашняя тяга с резинкой.",
+  "technique": "Резинка за стопы, сидя на полу. Тяни к животу, сводя лопатки.",
+  "mistakes": "Округление спины.",
+  "youtube_url": null
+ },
+ {
+  "id": "superman",
+  "name": "Супермен лёжа",
+  "group": "back",
+  "group_label": "Спина",
+  "equipment": [
+   "bodyweight",
+   "mat"
+  ],
+  "equipment_labels": [
+   "собственный вес",
+   "коврик"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "12–15",
+  "rest_sec": 30,
+  "description": "Разгибатели спины без оборудования.",
+  "technique": "Лёжа на животе, одновременно оторви руки и ноги от пола, задержись на 2 секунды.",
+  "mistakes": "Рывок; запрокидывание головы.",
+  "youtube_url": null
+ },
+ {
+  "id": "face_pull",
+  "name": "Тяга к лицу",
+  "group": "back",
+  "group_label": "Спина",
+  "equipment": [
+   "cable",
+   "band"
+  ],
+  "equipment_labels": [
+   "блок",
+   "резинки"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "15–20",
+  "rest_sec": 45,
+  "description": "Задние дельты и здоровье плеч.",
+  "technique": "Канат на уровне лица. Тяни к лицу, разводя концы, локти выше кистей.",
+  "mistakes": "Слишком большой вес; локти ниже плеч.",
+  "youtube_url": null
+ },
+ {
+  "id": "bench_press",
+  "name": "Жим штанги лёжа",
+  "group": "chest",
+  "group_label": "Грудь",
+  "equipment": [
+   "barbell",
+   "bench"
+  ],
+  "equipment_labels": [
+   "штанга",
+   "скамья"
+  ],
+  "level": "intermediate",
+  "level_label": "Средний",
+  "sets": 4,
+  "reps": "6–8",
+  "rest_sec": 120,
+  "description": "Базовый жим на грудь.",
+  "technique": "Лопатки сведены, стопы на полу. Опусти штангу к низу груди, локти под 45°, выжми вверх.",
+  "mistakes": "Отрыв таза; отбив от груди; локти в стороны.",
+  "youtube_url": null
+ },
+ {
+  "id": "bench_press_dumbbell",
+  "name": "Жим гантелей лёжа",
+  "group": "chest",
+  "group_label": "Грудь",
+  "equipment": [
+   "dumbbell",
+   "bench"
+  ],
+  "equipment_labels": [
+   "гантели",
+   "скамья"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "8–12",
+  "rest_sec": 90,
+  "description": "Более безопасный вариант жима для дома и зала.",
+  "technique": "Гантели на уровне груди. Выжми вверх и чуть внутрь, опусти до растяжения.",
+  "mistakes": "Слишком глубокое опускание; асимметрия.",
+  "youtube_url": null
+ },
+ {
+  "id": "pushup",
+  "name": "Отжимания от пола",
+  "group": "chest",
+  "group_label": "Грудь",
+  "equipment": [
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10–15",
+  "rest_sec": 60,
+  "description": "Классические отжимания.",
+  "technique": "Руки чуть шире плеч, тело в одну линию. Опусти грудь к полу, локти под 45°, выжми.",
+  "mistakes": "Провисание таза; голова вниз; неполная амплитуда.",
+  "youtube_url": null
+ },
+ {
+  "id": "pushup_knees",
+  "name": "Отжимания с колен",
+  "group": "chest",
+  "group_label": "Грудь",
+  "equipment": [
+   "bodyweight",
+   "mat"
+  ],
+  "equipment_labels": [
+   "собственный вес",
+   "коврик"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10–15",
+  "rest_sec": 45,
+  "description": "Облегчённые отжимания для новичков.",
+  "technique": "Как обычные отжимания, но упор на колени. Тело от колен до головы — прямая линия.",
+  "mistakes": "Таз вверх; грудь не опускается.",
+  "youtube_url": null
+ },
+ {
+  "id": "pushup_incline",
+  "name": "Отжимания от возвышения",
+  "group": "chest",
+  "group_label": "Грудь",
+  "equipment": [
+   "bodyweight",
+   "bench"
+  ],
+  "equipment_labels": [
+   "собственный вес",
+   "скамья"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "12–15",
+  "rest_sec": 45,
+  "description": "Руки на скамье — легче обычных отжиманий.",
+  "technique": "Руки на скамье, тело прямое. Опускайся до касания грудью.",
+  "mistakes": "Прогиб поясницы.",
+  "youtube_url": null
+ },
+ {
+  "id": "chest_fly_dumbbell",
+  "name": "Разведение гантелей лёжа",
+  "group": "chest",
+  "group_label": "Грудь",
+  "equipment": [
+   "dumbbell",
+   "bench"
+  ],
+  "equipment_labels": [
+   "гантели",
+   "скамья"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "12–15",
+  "rest_sec": 60,
+  "description": "Растяжение и изоляция груди.",
+  "technique": "Гантели над грудью, локти слегка согнуты. Разведи в стороны до уровня груди, сведи по дуге.",
+  "mistakes": "Прямые локти; слишком большой вес.",
+  "youtube_url": null
+ },
+ {
+  "id": "dips",
+  "name": "Отжимания на брусьях",
+  "group": "chest",
+  "group_label": "Грудь",
+  "equipment": [
+   "dip_bars"
+  ],
+  "equipment_labels": [
+   "брусья"
+  ],
+  "level": "intermediate",
+  "level_label": "Средний",
+  "sets": 3,
+  "reps": "8–10",
+  "rest_sec": 90,
+  "description": "Нижняя часть груди и трицепс.",
+  "technique": "Наклон вперёд. Опустись до угла 90° в локтях, выжми.",
+  "mistakes": "Слишком глубокое опускание; плечи к ушам.",
+  "youtube_url": null
+ },
+ {
+  "id": "chest_press_machine",
+  "name": "Жим в тренажёре сидя",
+  "group": "chest",
+  "group_label": "Грудь",
+  "equipment": [
+   "machine"
+  ],
+  "equipment_labels": [
+   "тренажёры"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10–12",
+  "rest_sec": 75,
+  "description": "Безопасный жим для новичков.",
+  "technique": "Рукоятки на уровне груди. Выжми вперёд, не разгибая локти полностью.",
+  "mistakes": "Поднятые плечи; отрыв спины.",
+  "youtube_url": null
+ },
+ {
+  "id": "overhead_press",
+  "name": "Жим штанги стоя",
+  "group": "shoulders",
+  "group_label": "Плечи",
+  "equipment": [
+   "barbell"
+  ],
+  "equipment_labels": [
+   "штанга"
+  ],
+  "level": "intermediate",
+  "level_label": "Средний",
+  "sets": 4,
+  "reps": "6–8",
+  "rest_sec": 120,
+  "description": "Базовый жим над головой.",
+  "technique": "Штанга на верху груди, хват чуть шире плеч. Выжми над головой, в верхней точке — штанга над макушкой. Корпус напряжён.",
+  "mistakes": "Прогиб в пояснице; жим перед собой.",
+  "youtube_url": null
+ },
+ {
+  "id": "shoulder_press_dumbbell",
+  "name": "Жим гантелей сидя",
+  "group": "shoulders",
+  "group_label": "Плечи",
+  "equipment": [
+   "dumbbell",
+   "bench"
+  ],
+  "equipment_labels": [
+   "гантели",
+   "скамья"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "8–12",
+  "rest_sec": 90,
+  "description": "Плечи с гантелями.",
+  "technique": "Гантели у ушей, локти под 90°. Выжми вверх до почти прямых рук, опусти подконтрольно.",
+  "mistakes": "Прогиб спины; локти слишком назад.",
+  "youtube_url": null
+ },
+ {
+  "id": "lateral_raise",
+  "name": "Махи гантелями в стороны",
+  "group": "shoulders",
+  "group_label": "Плечи",
+  "equipment": [
+   "dumbbell",
+   "band"
+  ],
+  "equipment_labels": [
+   "гантели",
+   "резинки"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "12–15",
+  "rest_sec": 45,
+  "description": "Средние дельты — ширина плеч.",
+  "technique": "Гантели вдоль тела. Подними в стороны до уровня плеч, локти чуть согнуты, мизинец чуть выше.",
+  "mistakes": "Раскачка; подъём выше плеч; слишком большой вес.",
+  "youtube_url": null
+ },
+ {
+  "id": "rear_delt_fly",
+  "name": "Разведение в наклоне",
+  "group": "shoulders",
+  "group_label": "Плечи",
+  "equipment": [
+   "dumbbell",
+   "band"
+  ],
+  "equipment_labels": [
+   "гантели",
+   "резинки"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "12–15",
+  "rest_sec": 45,
+  "description": "Задние дельты.",
+  "technique": "Наклон 45°, гантели внизу. Разведи в стороны, сводя лопатки в конце.",
+  "mistakes": "Округление спины; рывок.",
+  "youtube_url": null
+ },
+ {
+  "id": "front_raise",
+  "name": "Подъём гантелей перед собой",
+  "group": "shoulders",
+  "group_label": "Плечи",
+  "equipment": [
+   "dumbbell",
+   "band"
+  ],
+  "equipment_labels": [
+   "гантели",
+   "резинки"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "12–15",
+  "rest_sec": 45,
+  "description": "Передние дельты.",
+  "technique": "Гантели перед бёдрами. Подними до уровня глаз прямыми руками, опусти медленно.",
+  "mistakes": "Раскачка корпусом.",
+  "youtube_url": null
+ },
+ {
+  "id": "pike_pushup",
+  "name": "Отжимания уголком",
+  "group": "shoulders",
+  "group_label": "Плечи",
+  "equipment": [
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "собственный вес"
+  ],
+  "level": "intermediate",
+  "level_label": "Средний",
+  "sets": 3,
+  "reps": "8–12",
+  "rest_sec": 60,
+  "description": "Домашняя замена жима над головой.",
+  "technique": "Таз вверх, тело буквой Л. Опусти голову к полу, сгибая локти, выжми.",
+  "mistakes": "Слишком низкий таз.",
+  "youtube_url": null
+ },
+ {
+  "id": "curl_barbell",
+  "name": "Подъём штанги на бицепс",
+  "group": "biceps",
+  "group_label": "Бицепс",
+  "equipment": [
+   "barbell"
+  ],
+  "equipment_labels": [
+   "штанга"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10–12",
+  "rest_sec": 60,
+  "description": "Классика на бицепс.",
+  "technique": "Хват на ширине плеч, локти у корпуса. Согни руки, не двигая локтями, опусти медленно.",
+  "mistakes": "Раскачка корпусом; локти вперёд.",
+  "youtube_url": null
+ },
+ {
+  "id": "curl_dumbbell",
+  "name": "Сгибания с гантелями",
+  "group": "biceps",
+  "group_label": "Бицепс",
+  "equipment": [
+   "dumbbell"
+  ],
+  "equipment_labels": [
+   "гантели"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10–12",
+  "rest_sec": 60,
+  "description": "Сгибания с супинацией.",
+  "technique": "Гантели вдоль тела. Сгибая руку, разверни ладонь вверх. Опускай 2–3 секунды.",
+  "mistakes": "Рывки; локти уходят вперёд.",
+  "youtube_url": null
+ },
+ {
+  "id": "curl_hammer",
+  "name": "Молотковые сгибания",
+  "group": "biceps",
+  "group_label": "Бицепс",
+  "equipment": [
+   "dumbbell"
+  ],
+  "equipment_labels": [
+   "гантели"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10–12",
+  "rest_sec": 60,
+  "description": "Брахиалис и предплечья.",
+  "technique": "Хват нейтральный, ладони друг к другу. Сгибай руки без разворота.",
+  "mistakes": "Раскачка.",
+  "youtube_url": null
+ },
+ {
+  "id": "curl_band",
+  "name": "Сгибания с резинкой",
+  "group": "biceps",
+  "group_label": "Бицепс",
+  "equipment": [
+   "band"
+  ],
+  "equipment_labels": [
+   "резинки"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "15–20",
+  "rest_sec": 45,
+  "description": "Домашний вариант.",
+  "technique": "Резинка под стопами. Сгибай руки, локти на месте.",
+  "mistakes": "Локти вперёд.",
+  "youtube_url": null
+ },
+ {
+  "id": "chinup",
+  "name": "Подтягивания обратным хватом",
+  "group": "biceps",
+  "group_label": "Бицепс",
+  "equipment": [
+   "pullup_bar"
+  ],
+  "equipment_labels": [
+   "турник"
+  ],
+  "level": "intermediate",
+  "level_label": "Средний",
+  "sets": 3,
+  "reps": "6–10",
+  "rest_sec": 90,
+  "description": "Бицепс и спина.",
+  "technique": "Хват на ширине плеч ладонями к себе. Подтянись до подбородка.",
+  "mistakes": "Раскачка; половинная амплитуда.",
+  "youtube_url": null
+ },
+ {
+  "id": "triceps_pushdown",
+  "name": "Разгибание рук на блоке",
+  "group": "triceps",
+  "group_label": "Трицепс",
+  "equipment": [
+   "cable",
+   "band"
+  ],
+  "equipment_labels": [
+   "блок",
+   "резинки"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "12–15",
+  "rest_sec": 45,
+  "description": "Изоляция трицепса.",
+  "technique": "Локти у корпуса. Разогни руки полностью, задержись, верни подконтрольно.",
+  "mistakes": "Локти уходят вперёд; наклон корпуса.",
+  "youtube_url": null
+ },
+ {
+  "id": "triceps_extension_overhead",
+  "name": "Французский жим гантели над головой",
+  "group": "triceps",
+  "group_label": "Трицепс",
+  "equipment": [
+   "dumbbell"
+  ],
+  "equipment_labels": [
+   "гантели"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10–12",
+  "rest_sec": 60,
+  "description": "Длинная головка трицепса.",
+  "technique": "Гантель над головой двумя руками. Опусти за голову, сгибая локти, разогни.",
+  "mistakes": "Разведение локтей в стороны.",
+  "youtube_url": null
+ },
+ {
+  "id": "pushup_diamond",
+  "name": "Алмазные отжимания",
+  "group": "triceps",
+  "group_label": "Трицепс",
+  "equipment": [
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "собственный вес"
+  ],
+  "level": "intermediate",
+  "level_label": "Средний",
+  "sets": 3,
+  "reps": "8–12",
+  "rest_sec": 60,
+  "description": "Отжимания узким хватом.",
+  "technique": "Ладони вместе под грудью, пальцы образуют ромб. Опустись, локти вдоль тела, выжми.",
+  "mistakes": "Локти в стороны; провисание таза.",
+  "youtube_url": null
+ },
+ {
+  "id": "bench_dips",
+  "name": "Обратные отжимания от скамьи",
+  "group": "triceps",
+  "group_label": "Трицепс",
+  "equipment": [
+   "bench",
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "скамья",
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10–15",
+  "rest_sec": 45,
+  "description": "Трицепс с опорой на скамью.",
+  "technique": "Руки на краю скамьи за спиной. Опусти таз, сгибая локти до 90°, выжми.",
+  "mistakes": "Плечи вперёд; слишком глубоко.",
+  "youtube_url": null
+ },
+ {
+  "id": "skullcrusher",
+  "name": "Французский жим лёжа",
+  "group": "triceps",
+  "group_label": "Трицепс",
+  "equipment": [
+   "barbell",
+   "dumbbell",
+   "bench"
+  ],
+  "equipment_labels": [
+   "штанга",
+   "гантели",
+   "скамья"
+  ],
+  "level": "intermediate",
+  "level_label": "Средний",
+  "sets": 3,
+  "reps": "10–12",
+  "rest_sec": 60,
+  "description": "Разгибания лёжа.",
+  "technique": "Штанга над грудью. Опусти ко лбу, сгибая только локти, разогни.",
+  "mistakes": "Локти расходятся; движение плечами.",
+  "youtube_url": null
+ },
+ {
+  "id": "plank",
+  "name": "Планка",
+  "group": "abs",
+  "group_label": "Пресс",
+  "equipment": [
+   "bodyweight",
+   "mat"
+  ],
+  "equipment_labels": [
+   "собственный вес",
+   "коврик"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "30–60 сек",
+  "rest_sec": 45,
+  "description": "Статика на весь корпус.",
+  "technique": "Локти под плечами, тело в линию. Напряги пресс и ягодицы, не задерживай дыхание.",
+  "mistakes": "Провисание таза; таз вверх; голова вниз.",
+  "youtube_url": null
+ },
+ {
+  "id": "crunch",
+  "name": "Скручивания",
+  "group": "abs",
+  "group_label": "Пресс",
+  "equipment": [
+   "bodyweight",
+   "mat"
+  ],
+  "equipment_labels": [
+   "собственный вес",
+   "коврик"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "15–20",
+  "rest_sec": 30,
+  "description": "Верхняя часть пресса.",
+  "technique": "Лёжа, колени согнуты. Оторви лопатки от пола, скручиваясь вперёд. Поясница на полу.",
+  "mistakes": "Рывок шеей; отрыв поясницы.",
+  "youtube_url": null
+ },
+ {
+  "id": "leg_raise_lying",
+  "name": "Подъём ног лёжа",
+  "group": "abs",
+  "group_label": "Пресс",
+  "equipment": [
+   "bodyweight",
+   "mat"
+  ],
+  "equipment_labels": [
+   "собственный вес",
+   "коврик"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "12–15",
+  "rest_sec": 45,
+  "description": "Нижняя часть пресса.",
+  "technique": "Лёжа, руки под ягодицами. Подними прямые ноги до 90°, опусти медленно, не касаясь пола.",
+  "mistakes": "Прогиб поясницы; мах.",
+  "youtube_url": null
+ },
+ {
+  "id": "hanging_knee_raise",
+  "name": "Подъём коленей в висе",
+  "group": "abs",
+  "group_label": "Пресс",
+  "equipment": [
+   "pullup_bar"
+  ],
+  "equipment_labels": [
+   "турник"
+  ],
+  "level": "intermediate",
+  "level_label": "Средний",
+  "sets": 3,
+  "reps": "10–15",
+  "rest_sec": 60,
+  "description": "Пресс в висе.",
+  "technique": "В висе подними колени к груди, слегка скручивая таз. Опусти без раскачки.",
+  "mistakes": "Раскачка; отсутствие скручивания таза.",
+  "youtube_url": null
+ },
+ {
+  "id": "russian_twist",
+  "name": "Русские скручивания",
+  "group": "abs",
+  "group_label": "Пресс",
+  "equipment": [
+   "bodyweight",
+   "dumbbell",
+   "mat"
+  ],
+  "equipment_labels": [
+   "собственный вес",
+   "гантели",
+   "коврик"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "20 (по 10 на сторону)",
+  "rest_sec": 30,
+  "description": "Косые мышцы.",
+  "technique": "Сидя, спина под 45°, стопы приподняты. Поворачивай корпус в стороны.",
+  "mistakes": "Круглая спина; повороты только руками.",
+  "youtube_url": null
+ },
+ {
+  "id": "bicycle_crunch",
+  "name": "Велосипед",
+  "group": "abs",
+  "group_label": "Пресс",
+  "equipment": [
+   "bodyweight",
+   "mat"
+  ],
+  "equipment_labels": [
+   "собственный вес",
+   "коврик"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "20 (по 10 на сторону)",
+  "rest_sec": 30,
+  "description": "Пресс и косые.",
+  "technique": "Лёжа, локоть к противоположному колену попеременно. Темп контролируемый.",
+  "mistakes": "Тяга шеи руками; быстрый темп.",
+  "youtube_url": null
+ },
+ {
+  "id": "dead_bug",
+  "name": "Мёртвый жук",
+  "group": "abs",
+  "group_label": "Пресс",
+  "equipment": [
+   "bodyweight",
+   "mat"
+  ],
+  "equipment_labels": [
+   "собственный вес",
+   "коврик"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "10 на сторону",
+  "rest_sec": 30,
+  "description": "Стабилизация корпуса, безопасно для спины.",
+  "technique": "Лёжа, руки вверх, колени под 90°. Опусти противоположные руку и ногу, поясница прижата.",
+  "mistakes": "Отрыв поясницы.",
+  "youtube_url": null
+ },
+ {
+  "id": "mountain_climber",
+  "name": "Скалолаз",
+  "group": "abs",
+  "group_label": "Пресс",
+  "equipment": [
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "30 сек",
+  "rest_sec": 30,
+  "description": "Пресс + кардио.",
+  "technique": "Упор лёжа. Попеременно подтягивай колени к груди в быстром темпе.",
+  "mistakes": "Таз вверх; провисание.",
+  "youtube_url": null
+ },
+ {
+  "id": "jump_rope",
+  "name": "Скакалка",
+  "group": "cardio",
+  "group_label": "Кардио",
+  "equipment": [
+   "jump_rope"
+  ],
+  "equipment_labels": [
+   "скакалка"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "2 мин",
+  "rest_sec": 60,
+  "description": "Лёгкое кардио дома.",
+  "technique": "Прыгай на носках, невысоко, руки у корпуса, вращение кистями.",
+  "mistakes": "Высокие прыжки; приземление на пятки.",
+  "youtube_url": null
+ },
+ {
+  "id": "burpee",
+  "name": "Бёрпи",
+  "group": "cardio",
+  "group_label": "Кардио",
+  "equipment": [
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "собственный вес"
+  ],
+  "level": "intermediate",
+  "level_label": "Средний",
+  "sets": 3,
+  "reps": "10–12",
+  "rest_sec": 60,
+  "description": "Всё тело за одно движение.",
+  "technique": "Присед — упор лёжа — отжимание — прыжок вверх. Держи спину прямой.",
+  "mistakes": "Прогиб поясницы в упоре; неполный прыжок.",
+  "youtube_url": null
+ },
+ {
+  "id": "jumping_jack",
+  "name": "Прыжки с разведением рук и ног",
+  "group": "cardio",
+  "group_label": "Кардио",
+  "equipment": [
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "45 сек",
+  "rest_sec": 30,
+  "description": "Разминочное кардио.",
+  "technique": "Прыжком разведи ноги, руки над головой, прыжком вернись.",
+  "mistakes": "Тяжёлое приземление.",
+  "youtube_url": null
+ },
+ {
+  "id": "high_knees",
+  "name": "Бег на месте с высоким подниманием колена",
+  "group": "cardio",
+  "group_label": "Кардио",
+  "equipment": [
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 3,
+  "reps": "30 сек",
+  "rest_sec": 30,
+  "description": "Интенсивное кардио дома.",
+  "technique": "Поднимай колени до уровня таза в быстром темпе, руки работают.",
+  "mistakes": "Наклон корпуса назад.",
+  "youtube_url": null
+ },
+ {
+  "id": "treadmill_run",
+  "name": "Бег на дорожке",
+  "group": "cardio",
+  "group_label": "Кардио",
+  "equipment": [
+   "treadmill"
+  ],
+  "equipment_labels": [
+   "дорожка"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 1,
+  "reps": "20 мин",
+  "rest_sec": 0,
+  "description": "Равномерное кардио в зале.",
+  "technique": "Комфортный темп, при котором можно говорить короткими фразами. Мягкое приземление на среднюю часть стопы.",
+  "mistakes": "Слишком быстрый старт; держание за поручни.",
+  "youtube_url": null
+ },
+ {
+  "id": "bike",
+  "name": "Велотренажёр",
+  "group": "cardio",
+  "group_label": "Кардио",
+  "equipment": [
+   "bike"
+  ],
+  "equipment_labels": [
+   "велотренажёр"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 1,
+  "reps": "20 мин",
+  "rest_sec": 0,
+  "description": "Кардио без нагрузки на суставы.",
+  "technique": "Седло на уровне тазобедренного сустава. Каденс 80–90 об/мин, средняя нагрузка.",
+  "mistakes": "Слишком низкое седло.",
+  "youtube_url": null
+ },
+ {
+  "id": "walking_brisk",
+  "name": "Быстрая ходьба",
+  "group": "cardio",
+  "group_label": "Кардио",
+  "equipment": [
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 1,
+  "reps": "30 мин",
+  "rest_sec": 0,
+  "description": "Самое доступное кардио.",
+  "technique": "Темп, при котором дыхание учащается, но говорить можно. Плечи расслаблены.",
+  "mistakes": "Слишком медленный темп.",
+  "youtube_url": null
+ },
+ {
+  "id": "cat_cow",
+  "name": "Кошка-корова",
+  "group": "mobility",
+  "group_label": "Мобильность",
+  "equipment": [
+   "mat",
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "коврик",
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 2,
+  "reps": "10",
+  "rest_sec": 0,
+  "description": "Мобильность позвоночника.",
+  "technique": "На четвереньках. На вдохе прогни спину, на выдохе округли. Медленно.",
+  "mistakes": "Быстрый темп.",
+  "youtube_url": null
+ },
+ {
+  "id": "hip_flexor_stretch",
+  "name": "Растяжка сгибателей бедра",
+  "group": "mobility",
+  "group_label": "Мобильность",
+  "equipment": [
+   "mat",
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "коврик",
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 2,
+  "reps": "30 сек на сторону",
+  "rest_sec": 0,
+  "description": "Разгружает поясницу после сидения.",
+  "technique": "Выпад с коленом на полу. Подай таз вперёд, сожми ягодицу задней ноги.",
+  "mistakes": "Прогиб в пояснице.",
+  "youtube_url": null
+ },
+ {
+  "id": "world_greatest_stretch",
+  "name": "Самая большая растяжка мира",
+  "group": "mobility",
+  "group_label": "Мобильность",
+  "equipment": [
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 2,
+  "reps": "5 на сторону",
+  "rest_sec": 0,
+  "description": "Комплексная разминка всего тела.",
+  "technique": "Глубокий выпад, локоть к стопе, разворот корпуса с рукой вверх, вернись.",
+  "mistakes": "Спешка.",
+  "youtube_url": null
+ },
+ {
+  "id": "shoulder_dislocate_band",
+  "name": "Круги плечами с резинкой",
+  "group": "mobility",
+  "group_label": "Мобильность",
+  "equipment": [
+   "band"
+  ],
+  "equipment_labels": [
+   "резинки"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 2,
+  "reps": "10",
+  "rest_sec": 0,
+  "description": "Мобильность плеч.",
+  "technique": "Резинка широким хватом. Переведи через голову за спину и обратно прямыми руками.",
+  "mistakes": "Слишком узкий хват.",
+  "youtube_url": null
+ },
+ {
+  "id": "hamstring_stretch",
+  "name": "Растяжка задней поверхности бедра",
+  "group": "mobility",
+  "group_label": "Мобильность",
+  "equipment": [
+   "mat",
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "коврик",
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 2,
+  "reps": "30 сек на сторону",
+  "rest_sec": 0,
+  "description": "После тренировки ног.",
+  "technique": "Сидя, одна нога прямая. Наклон вперёд с прямой спиной к стопе.",
+  "mistakes": "Округление спины.",
+  "youtube_url": null
+ },
+ {
+  "id": "child_pose",
+  "name": "Поза ребёнка",
+  "group": "mobility",
+  "group_label": "Мобильность",
+  "equipment": [
+   "mat",
+   "bodyweight"
+  ],
+  "equipment_labels": [
+   "коврик",
+   "собственный вес"
+  ],
+  "level": "beginner",
+  "level_label": "Новичок",
+  "sets": 1,
+  "reps": "60 сек",
+  "rest_sec": 0,
+  "description": "Расслабление спины.",
+  "technique": "Сядь на пятки, руки вперёд, лоб к полу. Дыши глубоко.",
+  "mistakes": "Задержка дыхания.",
+  "youtube_url": null
+ }
+]
