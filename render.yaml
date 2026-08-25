@@ -16,7 +16,7 @@ services:
       - key: BOT_TOKEN
         sync: false            # вставить токен от @BotFather в дашборде Render
       - key: WEBAPP_URL
-        sync: false            # вставить URL сайта ai-fitness-frontend после первого деплоя
+        value: https://ai-fitness-frontend-a70h.onrender.com
       - key: DATABASE_URL
         value: sqlite:///./aifitness.db
       - key: AI_PROVIDER
@@ -38,4 +38,4 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        sync: false            # вставить URL сервиса ai-fitness-backend, затем Manual Deploy
+        value: https://ai-fitness-backend-92be.onrender.com
