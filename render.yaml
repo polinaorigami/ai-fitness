@@ -11,6 +11,8 @@ services:
     startCommand: bash start.sh
     healthCheckPath: /health
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.6
       - key: BOT_TOKEN
         sync: false            # вставить токен от @BotFather в дашборде Render
       - key: WEBAPP_URL
