@@ -1,0 +1,39 @@
+# Render Blueprint: создаёт backend+bot (один Web Service) и frontend (Static Site).
+# Деплой: render.com -> New + -> Blueprint -> выбрать репозиторий ai-fitness.
+# Подробности и порядок действий -> DEPLOY.md
+services:
+  - type: web
+    name: ai-fitness-backend
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash start.sh
+    healthCheckPath: /health
+    envVars:
+      - key: BOT_TOKEN
+        sync: false            # вставить токен от @BotFather в дашборде Render
+      - key: WEBAPP_URL
+        sync: false            # вставить URL сайта ai-fitness-frontend после первого деплоя
+      - key: DATABASE_URL
+        value: sqlite:///./aifitness.db
+      - key: AI_PROVIDER
+        value: rules
+      - key: OLLAMA_URL
+        value: http://localhost:11434
+      - key: OLLAMA_MODEL
+        value: qwen2.5:7b
+      - key: DEV_SKIP_AUTH
+        value: "false"
+      - key: UPLOAD_DIR
+        value: ./uploads
+
+  - type: web
+    name: ai-fitness-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false            # вставить URL сервиса ai-fitness-backend, затем Manual Deploy
