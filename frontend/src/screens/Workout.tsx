@@ -5,26 +5,53 @@ import { openLink, notify, haptic } from "../tg";
 
 type Phase = "overview" | "exercise" | "set" | "rest" | "finish" | "feedback";
 type Log = { exercise_id: string; set_number: number; weight_kg: number; reps: number };
+type Saved = { dayIndex: number; phase: Phase; ei: number; si: number; w: number; reps: number; logs: Log[]; sid: number | null; rest: number; restTotal: number; startedAt: number };
+
+const SESSION_KEY = "aifitness_active_workout";
+const loadSession = (dayIndex: number): Saved | null => {
+  try { const raw = localStorage.getItem(SESSION_KEY); if (!raw) return null;
+    const s = JSON.parse(raw) as Saved;
+    if (s.dayIndex !== dayIndex || s.phase === "finish" || s.phase === "feedback") return null;
+    return s;
+  } catch { return null; }
+};
+const saveSession = (s: Saved) => { try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch {} };
+export const clearSession = () => { try { localStorage.removeItem(SESSION_KEY); } catch {} };
+export const hasActiveSession = () => { try { const raw = localStorage.getItem(SESSION_KEY); if (!raw) return null;
+    const s = JSON.parse(raw) as Saved; return s.phase === "finish" || s.phase === "feedback" ? null : s.dayIndex; } catch { return null; } };
+
+const TRACKS: { id: string; title: string; src?: string }[] = [
+  { id: "ambient", title: "Спокойный эмбиент" },
+  { id: "oy", title: "Ой, не надо", src: "/music/oy-ne-nado.mp3" },
+  { id: "stay", title: "Stay Close", src: "/music/stay-close.mp3" },
+  { id: "lie", title: "Lie to Me", src: "/music/lie-to-me.mp3" },
+  { id: "amore", title: "Amore Mio", src: "/music/amore-mio.mp3" },
+];
+const TRACK_KEY = "aifitness_music_track";
+const loadTrackIdx = () => { try { const v = +(localStorage.getItem(TRACK_KEY) || 0); return v >= 0 && v < TRACKS.length ? v : 0; } catch { return 0; } };
 
 export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day; dayIndex: number; exercises: Record<string, Exercise>; onExit: () => void }) {
-  const [phase, setPhase] = useState<Phase>("overview");
-  const [ei, setEi] = useState(0); const [si, setSi] = useState(1);
-  const [w, setW] = useState(0); const [reps, setReps] = useState(10);
-  const [logs, setLogs] = useState<Log[]>([]);
-  const [sid, setSid] = useState<number | null>(null);
-  const [rest, setRest] = useState(0); const [restTotal, setRestTotal] = useState(0);
+  const resumed = useMemo(() => loadSession(dayIndex), []);
+  const [phase, setPhase] = useState<Phase>(resumed?.phase ?? "overview");
+  const [ei, setEi] = useState(resumed?.ei ?? 0); const [si, setSi] = useState(resumed?.si ?? 1);
+  const [w, setW] = useState(resumed?.w ?? 0); const [reps, setReps] = useState(resumed?.reps ?? 10);
+  const [logs, setLogs] = useState<Log[]>(resumed?.logs ?? []);
+  const [sid, setSid] = useState<number | null>(resumed?.sid ?? null);
+  const [rest, setRest] = useState(resumed?.rest ?? 0); const [restTotal, setRestTotal] = useState(resumed?.restTotal ?? 0);
   const [fin, setFin] = useState<Finish | null>(null);
   const [rpe, setRpe] = useState(5); const [hard, setHard] = useState(""); const [easy, setEasy] = useState(""); const [fbMsg, setFbMsg] = useState("");
   const [how, setHow] = useState(false); const [err, setErr] = useState("");
   const [musicOn, setMusicOn] = useState(false);
-  const audioRef = useRef<{ ctx: AudioContext; nodes: (OscillatorNode | GainNode)[] } | null>(null);
-  const start = useRef(Date.now());
+  const [trackIdx, setTrackIdx] = useState(loadTrackIdx());
+  const audioSynthRef = useRef<{ ctx: AudioContext; nodes: (OscillatorNode | GainNode)[] } | null>(null);
+  const audioElRef = useRef<HTMLAudioElement | null>(null);
+  const start = useRef(resumed?.startedAt ?? Date.now());
 
-  const startMusic = () => {
-    if (audioRef.current) return;
+  const startSynth = () => {
+    if (audioSynthRef.current) return;
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
     const master = ctx.createGain(); master.gain.value = 0.06; master.connect(ctx.destination);
-    const notes = [174.61, 220, 261.63]; // спокойный эмбиент-аккорд, без внешних треков
+    const notes = [174.61, 220, 261.63];
     const nodes: (OscillatorNode | GainNode)[] = [master];
     notes.forEach((f, i) => {
       const osc = ctx.createOscillator(); osc.type = "sine"; osc.frequency.value = f;
@@ -33,21 +60,37 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
       g.gain.linearRampToValueAtTime(1 / notes.length, ctx.currentTime + 1.5 + i * 0.3);
       nodes.push(osc, g);
     });
-    audioRef.current = { ctx, nodes };
+    audioSynthRef.current = { ctx, nodes };
   };
-  const stopMusic = () => { audioRef.current?.ctx.close(); audioRef.current = null; };
-  const toggleMusic = () => { musicOn ? stopMusic() : startMusic(); setMusicOn(!musicOn); };
+  const stopSynth = () => { audioSynthRef.current?.ctx.close(); audioSynthRef.current = null; };
+  const stopTrack = () => { audioElRef.current?.pause(); };
+  const playTrackIdx = (idx: number) => {
+    stopSynth(); stopTrack();
+    const t = TRACKS[idx];
+    if (t.id === "ambient") { startSynth(); return; }
+    if (audioElRef.current) { audioElRef.current.src = t.src!; audioElRef.current.currentTime = 0; audioElRef.current.play().catch(() => {}); }
+  };
+  const stopMusic = () => { stopSynth(); stopTrack(); };
+  const toggleMusic = () => { const on = !musicOn; setMusicOn(on); if (on) playTrackIdx(trackIdx); else stopMusic(); };
+  const nextTrack = () => { const idx = (trackIdx + 1) % TRACKS.length; setTrackIdx(idx); try { localStorage.setItem(TRACK_KEY, String(idx)); } catch {} if (musicOn) playTrackIdx(idx); };
   useEffect(() => () => stopMusic(), []);
   useEffect(() => { if (phase !== "rest" && musicOn) { stopMusic(); setMusicOn(false); } }, [phase]);
   const cur = day.exercises[ei]; const ex = exercises[cur?.exercise_id];
   const parseReps = (r: string) => parseInt(r) || 10;
 
-  useEffect(() => { if (cur) { setW(cur.weight_kg); setReps(parseReps(cur.reps)); } }, [ei]);
+  useEffect(() => { if (!resumed && cur) { setW(cur.weight_kg); setReps(parseReps(cur.reps)); } }, [ei]);
   useEffect(() => {
     if (phase !== "rest") return;
     if (rest <= 0) { notify("success"); return; }
     const t = setTimeout(() => setRest(rest - 1), 1000); return () => clearTimeout(t);
   }, [phase, rest]);
+
+  // Сохраняем прогресс тренировки на устройстве, чтобы при закрытии/перезагрузке приложения
+  // можно было продолжить с того же места, а не начинать заново.
+  useEffect(() => {
+    if (phase === "overview") { clearSession(); return; }
+    saveSession({ dayIndex, phase, ei, si, w, reps, logs, sid, rest, restTotal, startedAt: start.current });
+  }, [phase, ei, si, w, reps, logs, sid, rest, restTotal]);
 
   const begin = async () => { try { const r = await api.sessionStart(dayIndex); setSid(r.session_id); start.current = Date.now(); setPhase("exercise"); } catch (e: any) { setErr(e.message); } };
   const doneSet = () => {
@@ -66,7 +109,7 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
   const canGoBack = phase === "rest" || si > 1 || ei > 0 || phase === "exercise";
   const finishAll = async (partial?: Log[]) => {
     const all = partial ?? logs;
-    try { const r = await api.sessionFinish(sid!, { duration_sec: Math.round((Date.now() - start.current) / 1000), sets: all }); setFin(r); setPhase("finish"); notify("success"); }
+    try { const r = await api.sessionFinish(sid!, { duration_sec: Math.round((Date.now() - start.current) / 1000), sets: all }); setFin(r); setPhase("finish"); clearSession(); notify("success"); }
     catch (e: any) { setErr(e.message); }
   };
   const sendFb = async () => { try { const r = await api.feedback(sid!, { rpe, too_hard: hard, too_easy: easy }); setFbMsg(r.message); } catch (e: any) { setErr(e.message); } };
@@ -128,10 +171,15 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
 
   if (phase === "rest") { const pct = restTotal ? rest / restTotal : 0; const R = 104, C = 2 * Math.PI * R; return (
     <div className="screen no-nav fade" style={{ textAlign: "center" }}>
+      <audio ref={audioElRef} loop />
       <div className="row between">
         <button className="btn ghost sm" style={{ width: "auto" }} onClick={goBack}>← Назад</button>
-        <button className="btn ghost sm" style={{ width: "auto" }} onClick={toggleMusic}>{musicOn ? "♪ Музыка вкл" : "♪ Музыка"}</button>
+        <button className="btn ghost sm" style={{ width: "auto" }} onClick={toggleMusic}>{musicOn ? "♪ Пауза" : "♪ Музыка"}</button>
       </div>
+      {musicOn && <div className="row between" style={{ marginTop: 8 }}>
+        <span style={{ fontSize: 13, color: "var(--muted)" }}>{TRACKS[trackIdx].title}</span>
+        <button className="btn ghost sm" style={{ width: "auto" }} onClick={nextTrack}>Следующий трек ⏭</button>
+      </div>}
       <div className="eyebrow" style={{ marginTop: 24 }}>Отдых</div>
       <div className="timer-ring"><svg viewBox="0 0 240 240" width="100%"><circle cx="120" cy="120" r={R} fill="none" stroke="var(--line)" strokeWidth="10" /><circle cx="120" cy="120" r={R} fill="none" stroke="var(--accent)" strokeWidth="10" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - pct)} style={{ transition: "stroke-dashoffset 1s linear" }} /></svg>
         <div className="n"><div className="big" style={{ fontSize: 72 }}>{rest}</div><div style={{ color: "var(--muted)" }}>секунд</div></div></div>

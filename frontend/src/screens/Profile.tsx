@@ -27,6 +27,13 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
   const toggle = async (k: keyof User) => { const u = await api.settings({ [k]: !user[k] }); setUser(u); };
   const time = async (v: string) => { const u = await api.settings({ workout_time: v }); setUser(u); };
   const pickTheme = (id: string) => { setThemeState(id); setTheme(id); };
+  const [zoneBusy, setZoneBusy] = useState(false);
+  const pickZone = async (id: string) => {
+    if (id === (user.focus_zone || "full")) return;
+    setZoneBusy(true);
+    try { await api.settings({ focus_zone: id }); await api.generate(); location.reload(); }
+    catch { setZoneBusy(false); }
+  };
   const del = async (what: "photos" | "history" | "account") => {
     const q = { photos: "Удалить все фотографии? Это нельзя отменить.", history: "Удалить всю историю тренировок, замеры и чат?", account: "Удалить аккаунт и все данные полностью?" }[what];
     if (!confirm(q)) return; setBusy(what);
@@ -40,7 +47,11 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
       <div className="row" style={{ marginBottom: 8 }}>{user.photo_url && <img src={user.photo_url} style={{ width: 56, height: 56, borderRadius: 18 }} />}<div><h1 className="display" style={{ margin: 0, fontSize: 28 }}>{user.first_name}</h1>{user.username && <div style={{ color: "var(--muted)" }}>@{user.username}</div>}</div></div>
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Профиль</div>
       <Card><Row l="Цель" v={G[user.goal!]} /><Row l="Акцент" v={zoneLabel(user.focus_zone)} /><Row l="Возраст" v={user.age} /><Row l="Рост" v={user.height_cm && `${user.height_cm} см`} /><Row l="Вес" v={user.weight_kg && `${user.weight_kg} кг`} /><Row l="Тренировок в неделю" v={user.days_per_week} /><Row l="Опыт" v={L[user.level!]} /><Row l="Оборудование" v={<span style={{ fontSize: 13 }}>{user.equipment.map(eqLabel).join(", ")}</span>} />
-        <div style={{ height: 12 }} /><Btn kind="ghost" onClick={onRedo}>Изменить анкету и пересобрать план</Btn></Card>
+        <div style={{ height: 16 }} />
+        <div className="eyebrow" style={{ marginBottom: 8 }}>Быстро сменить акцент</div>
+        <div className="chips" style={{ marginBottom: 14 }}>{ZONES.map(([k, ic, l]) => <button key={k} className={`chip ${(user.focus_zone || "full") === k ? "on" : ""}`} disabled={zoneBusy} onClick={() => pickZone(k)}>{ic} {l}</button>)}</div>
+        {zoneBusy && <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 10 }}>Пересобираем план…</div>}
+        <Btn kind="ghost" onClick={onRedo}>Изменить анкету и пересобрать план</Btn></Card>
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Внешний вид</div>
       <Card>
         <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 12 }}>Цвет приложения</div>

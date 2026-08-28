@@ -5,7 +5,7 @@ import { initTheme } from "./theme";
 import { Nav, Loading, Btn, Err } from "./components/UI";
 import { NAV_ITEMS, NavId, getNavOrder } from "./navPrefs";
 import Welcome from "./screens/Welcome"; import Onboarding from "./screens/Onboarding"; import Photos from "./screens/Photos"; import Analysis from "./screens/Analysis";
-import Home from "./screens/Home"; import Schedule from "./screens/Schedule"; import Workout from "./screens/Workout"; import Progress from "./screens/Progress"; import Profile from "./screens/Profile"; import Coach from "./screens/Coach";
+import Home from "./screens/Home"; import Schedule from "./screens/Schedule"; import Workout, { hasActiveSession } from "./screens/Workout"; import Progress from "./screens/Progress"; import Profile from "./screens/Profile"; import Coach from "./screens/Coach";
 
 type Screen = "loading" | "welcome" | "onboarding" | "photos" | "analysis" | "home" | "schedule" | "workout" | "progress" | "profile" | "coach";
 
@@ -26,7 +26,14 @@ export default function App() {
       setUser(u); setExercises(Object.fromEntries(ex.map(e => [e.id, e])));
       if (u.timezone_offset !== tzOffset()) api.settings({ timezone_offset: tzOffset() }).catch(() => {});
       if (!u.onboarded) { setScreen("welcome"); return; }
-      try { await refresh(); setScreen("home"); } catch { setScreen("analysis"); }
+      try {
+        const [p, t] = await Promise.all([api.program(), api.today()]);
+        setProgram(p); setToday(t);
+        const activeDay = hasActiveSession();
+        if (activeDay !== null && p.week[activeDay] && !p.week[activeDay].rest) {
+          setWk({ day: p.week[activeDay], index: activeDay }); setScreen("workout");
+        } else setScreen("home");
+      } catch { setScreen("analysis"); }
     } catch (e: any) { setErr(e.message); }
   })(); }, []);
 

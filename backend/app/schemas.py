@@ -28,4 +28,4 @@ class SettingsIn(BaseModel):
     remind_workout: bool | None = None; remind_rest: bool | None = None
     weekly_report: bool | None = None; remind_progress: bool | None = None
     workout_time: str | None = None; timezone_offset: int | None = None
-    taplink_url: str | None = None
+    taplink_url: str | None = None; focus_zone: str | None = None
