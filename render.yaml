@@ -18,7 +18,7 @@ services:
       - key: WEBAPP_URL
         value: https://ai-fitness-frontend-a70h.onrender.com
       - key: DATABASE_URL
-        value: sqlite:///./aifitness.db
+        sync: false            # postgresql+psycopg://... из Neon/Supabase — вставить в дашборде Render (см. DEPLOY.md)
       - key: AI_PROVIDER
         value: rules
       - key: OLLAMA_URL
