@@ -3,6 +3,8 @@ import { Btn, Card } from "../components/UI";
 import { api, User } from "../api";
 import { EQUIP } from "./Onboarding";
 import { THEME_PRESETS, getTheme, setTheme } from "../theme";
+import { openLink } from "../tg";
+const CREATOR_LINK = "https://polinapeiv.taplink.ws";
 const G: Record<string, string> = { weight_loss: "Снижение веса", muscle: "Набор мышц", recomp: "Рекомпозиция тела", strength: "Стать сильнее", fitness: "Улучшить физическую форму", endurance: "Развить выносливость" };
 const L: Record<string, string> = { beginner: "Новичок", intermediate: "Средний", advanced: "Продвинутый" };
 export default function Profile({ user, setUser, onRedo, onLogout }: { user: User; setUser: (u: User) => void; onRedo: () => void; onLogout: () => void }) {
@@ -61,6 +63,15 @@ export default function Profile({ user, setUser, onRedo, onLogout }: { user: Use
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Данные</div>
       <Card><div className="stack"><Btn kind="danger" disabled={!!busy} onClick={() => del("photos")}>Удалить фотографии</Btn><Btn kind="danger" disabled={!!busy} onClick={() => del("history")}>Удалить историю</Btn><Btn kind="danger" disabled={!!busy} onClick={() => del("account")}>Удалить аккаунт</Btn></div>
         <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 12 }}>Фото не используются для обучения моделей и не передаются сторонним сервисам.</div></Card>
+      <div className="eyebrow" style={{ margin: "18px 0 8px" }}>О создателе</div>
+      <Card>
+        <div style={{ textAlign: "center" }}>
+          <img src="/creator-qr.png" alt="QR-код" style={{ width: 140, height: 140, borderRadius: 16, marginBottom: 14 }} />
+          <div style={{ fontWeight: 600, fontSize: 17, marginBottom: 4 }}>Полина</div>
+          <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 16 }}>Автор приложения AI FITNESS</div>
+          <Btn kind="soft" onClick={() => openLink(CREATOR_LINK)}>Мои соцсети · Taplink</Btn>
+        </div>
+      </Card>
     </div>
   );
 }
