@@ -5,7 +5,7 @@ import { initTheme } from "./theme";
 import { Nav, Loading, Btn, Err } from "./components/UI";
 import { NAV_ITEMS, NavId, getNavOrder } from "./navPrefs";
 import Welcome from "./screens/Welcome"; import Onboarding from "./screens/Onboarding"; import Photos from "./screens/Photos"; import Analysis from "./screens/Analysis";
-import Home from "./screens/Home"; import Schedule from "./screens/Schedule"; import Workout, { hasActiveSession } from "./screens/Workout"; import Progress from "./screens/Progress"; import Profile from "./screens/Profile"; import Coach from "./screens/Coach";
+import Home from "./screens/Home"; import Schedule from "./screens/Schedule"; import Workout, { hasActiveSession, clearSession } from "./screens/Workout"; import Progress from "./screens/Progress"; import Profile from "./screens/Profile"; import Coach from "./screens/Coach";
 
 type Screen = "loading" | "welcome" | "onboarding" | "photos" | "analysis" | "home" | "schedule" | "workout" | "progress" | "profile" | "coach";
 
@@ -60,7 +60,7 @@ export default function App() {
     {screen === "home" && !today.day.rest && !today.done_today && <div style={{ maxWidth: 480, margin: "-90px auto 0", padding: "0 18px 100px" }}><Btn kind="ghost" onClick={startShort}>Короткая версия · 20 минут</Btn></div>}
     {screen === "schedule" && <Schedule program={program} todayIndex={today.day_index} onStart={startWorkout} onBack={() => setScreen("home")} />}
     {screen === "progress" && <Progress />}
-    {screen === "profile" && <Profile user={user} setUser={setUser} onRedo={() => setScreen("onboarding")} onLogout={() => location.reload()} navOrder={navOrder} onNavChange={setNavOrderState} />}
+    {screen === "profile" && <Profile user={user} setUser={setUser} onRedo={() => { clearSession(); setScreen("onboarding"); }} onLogout={() => location.reload()} navOrder={navOrder} onNavChange={setNavOrderState} />}
     <Nav tab={tab} go={go} items={navItems} />
   </>);
 }

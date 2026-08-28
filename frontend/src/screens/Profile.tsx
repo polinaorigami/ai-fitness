@@ -5,6 +5,7 @@ import { EQUIP, ZONES } from "./Onboarding";
 import { THEME_PRESETS, getTheme, setTheme } from "../theme";
 import { openLink } from "../tg";
 import { NAV_ITEMS, NavId, setNavOrder as saveNavOrder } from "../navPrefs";
+import { clearSession } from "./Workout";
 const CREATOR_LINK = "https://polinapeiv.taplink.ws";
 const G: Record<string, string> = { weight_loss: "Снижение веса", muscle: "Набор мышц", recomp: "Рекомпозиция тела", strength: "Стать сильнее", fitness: "Улучшить физическую форму", endurance: "Развить выносливость" };
 const L: Record<string, string> = { beginner: "Новичок", intermediate: "Средний", advanced: "Продвинутый" };
@@ -30,7 +31,7 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
   const [zoneBusy, setZoneBusy] = useState(false);
   const pickZone = async (id: string) => {
     if (id === (user.focus_zone || "full")) return;
-    setZoneBusy(true);
+    setZoneBusy(true); clearSession();
     try { await api.settings({ focus_zone: id }); await api.generate(); location.reload(); }
     catch { setZoneBusy(false); }
   };
