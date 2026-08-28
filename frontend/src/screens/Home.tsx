@@ -1,7 +1,7 @@
 import { Btn, Card, Stat, greet } from "../components/UI";
 import { Today, User, ProgramT } from "../api";
 
-export default function Home({ user, today, program, onStart, go }: { user: User; today: Today; program: ProgramT; onStart: (dayIndex: number) => void; go: (t: string) => void }) {
+export default function Home({ user, today, program, onStart, onShort, go }: { user: User; today: Today; program: ProgramT; onStart: (dayIndex: number) => void; onShort: () => void; go: (t: string) => void }) {
   const d = today.day;
   return (
     <div className="screen fade">
@@ -22,6 +22,8 @@ export default function Home({ user, today, program, onStart, go }: { user: User
         <Card accent><div className="eyebrow">Сегодня</div><div className="big" style={{ margin: "10px 0", fontSize: 40 }}>{d.title.toUpperCase()}</div>
           <div className="row" style={{ gap: 20, marginBottom: 20 }}><div><div className="mid">{d.exercises.length}</div><div style={{ fontSize: 13, opacity: .8 }}>упражнений</div></div><div><div className="mid">~{today.estimated_minutes}</div><div style={{ fontSize: 13, opacity: .8 }}>минут</div></div></div>
           <Btn kind="ghost" onClick={() => onStart(today.day_index)}>Начать тренировку</Btn>
+          <div style={{ height: 10 }} />
+          <Btn kind="ghost" onClick={onShort}>Короткая версия · 20 минут</Btn>
         </Card>
       )}
       <div className="eyebrow" style={{ margin: "8px 0 10px" }}>Твой прогресс</div>

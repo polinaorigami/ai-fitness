@@ -4,6 +4,7 @@ import { initTelegram, tzOffset } from "./tg";
 import { initTheme } from "./theme";
 import { Nav, Loading, Btn, Err } from "./components/UI";
 import { NAV_ITEMS, NavId, getNavOrder } from "./navPrefs";
+import MusicWidget from "./musicWidget";
 import Welcome from "./screens/Welcome"; import Onboarding from "./screens/Onboarding"; import Photos from "./screens/Photos"; import Analysis from "./screens/Analysis";
 import Home from "./screens/Home"; import Schedule from "./screens/Schedule"; import Workout, { hasActiveSession, clearSession } from "./screens/Workout"; import Progress from "./screens/Progress"; import Profile from "./screens/Profile"; import Coach from "./screens/Coach";
 
@@ -38,7 +39,7 @@ export default function App() {
   })(); }, []);
 
   const startWorkout = (index: number) => { if (!program) return; setWk({ day: program.week[index], index }); setScreen("workout"); };
-  const startShort = async () => { const r = await api.short(); setWk({ day: r.day, index: r.day_index }); setScreen("workout"); };
+  const startShort = async () => { try { const r = await api.short(); setWk({ day: r.day, index: r.day_index }); setScreen("workout"); } catch (e: any) { alert(e.message || "Не удалось собрать короткую версию"); } };
   const go = (t: string) => {
     if (t === "workout") { if (today && !today.day.rest) startWorkout(today.day_index); else setScreen("schedule"); }
     else setScreen(t as Screen);
@@ -49,15 +50,15 @@ export default function App() {
   if (err) return <div className="screen no-nav"><h1 className="display">Не удалось подключиться</h1><Err e={err} /><div style={{ height: 12 }} /><Btn onClick={() => location.reload()}>Повторить</Btn></div>;
   if (screen === "loading" || !user) return <Loading />;
   if (screen === "welcome") return <Welcome onNext={() => setScreen("onboarding")} />;
-  if (screen === "onboarding") return <Onboarding onDone={async () => { setUser(await api.me()); setScreen("photos"); }} />;
-  if (screen === "photos") return <Photos onDone={() => setScreen("analysis")} />;
-  if (screen === "analysis") return <Analysis onDone={async () => { await refresh(); setScreen("home"); }} />;
-  if (screen === "workout" && wk) return <Workout day={wk.day} dayIndex={wk.index} exercises={exercises} onExit={async () => { await refresh(); setScreen("home"); }} />;
-  if (screen === "coach") return <Coach onBack={() => setScreen("home")} onProgramChanged={refresh} />;
+  if (screen === "onboarding") return <><MusicWidget /><Onboarding onDone={async () => { setUser(await api.me()); setScreen("photos"); }} /></>;
+  if (screen === "photos") return <><MusicWidget /><Photos onDone={() => setScreen("analysis")} /></>;
+  if (screen === "analysis") return <><MusicWidget /><Analysis onDone={async () => { await refresh(); setScreen("home"); }} /></>;
+  if (screen === "workout" && wk) return <><MusicWidget /><Workout day={wk.day} dayIndex={wk.index} exercises={exercises} onExit={async () => { await refresh(); setScreen("home"); }} /></>;
+  if (screen === "coach") return <><MusicWidget /><Coach onBack={() => setScreen("home")} onProgramChanged={refresh} /></>;
   if (!program || !today) return <Loading />;
   return (<>
-    {screen === "home" && <Home user={user} today={today} program={program} onStart={startWorkout} go={go} />}
-    {screen === "home" && !today.day.rest && !today.done_today && <div style={{ maxWidth: 480, margin: "-90px auto 0", padding: "0 18px 100px" }}><Btn kind="ghost" onClick={startShort}>Короткая версия · 20 минут</Btn></div>}
+    <MusicWidget />
+    {screen === "home" && <Home user={user} today={today} program={program} onStart={startWorkout} onShort={startShort} go={go} />}
     {screen === "schedule" && <Schedule program={program} todayIndex={today.day_index} onStart={startWorkout} onBack={() => setScreen("home")} />}
     {screen === "progress" && <Progress />}
     {screen === "profile" && <Profile user={user} setUser={setUser} onRedo={() => { clearSession(); setScreen("onboarding"); }} onLogout={() => location.reload()} navOrder={navOrder} onNavChange={setNavOrderState} />}

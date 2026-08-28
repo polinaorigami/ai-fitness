@@ -20,16 +20,6 @@ export const clearSession = () => { try { localStorage.removeItem(SESSION_KEY); 
 export const hasActiveSession = () => { try { const raw = localStorage.getItem(SESSION_KEY); if (!raw) return null;
     const s = JSON.parse(raw) as Saved; return s.phase === "finish" || s.phase === "feedback" ? null : s.dayIndex; } catch { return null; } };
 
-const TRACKS: { id: string; title: string; src?: string }[] = [
-  { id: "ambient", title: "Спокойный эмбиент" },
-  { id: "oy", title: "Ой, не надо", src: "/music/oy-ne-nado.mp3" },
-  { id: "stay", title: "Stay Close", src: "/music/stay-close.mp3" },
-  { id: "lie", title: "Lie to Me", src: "/music/lie-to-me.mp3" },
-  { id: "amore", title: "Amore Mio", src: "/music/amore-mio.mp3" },
-];
-const TRACK_KEY = "aifitness_music_track";
-const loadTrackIdx = () => { try { const v = +(localStorage.getItem(TRACK_KEY) || 0); return v >= 0 && v < TRACKS.length ? v : 0; } catch { return 0; } };
-
 export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day; dayIndex: number; exercises: Record<string, Exercise>; onExit: () => void }) {
   const resumed = useMemo(() => loadSession(dayIndex), []);
   const [phase, setPhase] = useState<Phase>(resumed?.phase ?? "overview");
@@ -41,40 +31,7 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
   const [fin, setFin] = useState<Finish | null>(null);
   const [rpe, setRpe] = useState(5); const [hard, setHard] = useState(""); const [easy, setEasy] = useState(""); const [fbMsg, setFbMsg] = useState("");
   const [how, setHow] = useState(false); const [err, setErr] = useState("");
-  const [musicOn, setMusicOn] = useState(false);
-  const [trackIdx, setTrackIdx] = useState(loadTrackIdx());
-  const audioSynthRef = useRef<{ ctx: AudioContext; nodes: (OscillatorNode | GainNode)[] } | null>(null);
-  const audioElRef = useRef<HTMLAudioElement | null>(null);
   const start = useRef(resumed?.startedAt ?? Date.now());
-
-  const startSynth = () => {
-    if (audioSynthRef.current) return;
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const master = ctx.createGain(); master.gain.value = 0.06; master.connect(ctx.destination);
-    const notes = [174.61, 220, 261.63];
-    const nodes: (OscillatorNode | GainNode)[] = [master];
-    notes.forEach((f, i) => {
-      const osc = ctx.createOscillator(); osc.type = "sine"; osc.frequency.value = f;
-      const g = ctx.createGain(); g.gain.value = 0;
-      osc.connect(g); g.connect(master); osc.start();
-      g.gain.linearRampToValueAtTime(1 / notes.length, ctx.currentTime + 1.5 + i * 0.3);
-      nodes.push(osc, g);
-    });
-    audioSynthRef.current = { ctx, nodes };
-  };
-  const stopSynth = () => { audioSynthRef.current?.ctx.close(); audioSynthRef.current = null; };
-  const stopTrack = () => { audioElRef.current?.pause(); };
-  const playTrackIdx = (idx: number) => {
-    stopSynth(); stopTrack();
-    const t = TRACKS[idx];
-    if (t.id === "ambient") { startSynth(); return; }
-    if (audioElRef.current) { audioElRef.current.src = t.src!; audioElRef.current.currentTime = 0; audioElRef.current.play().catch(() => {}); }
-  };
-  const stopMusic = () => { stopSynth(); stopTrack(); };
-  const toggleMusic = () => { const on = !musicOn; setMusicOn(on); if (on) playTrackIdx(trackIdx); else stopMusic(); };
-  const nextTrack = () => { const idx = (trackIdx + 1) % TRACKS.length; setTrackIdx(idx); try { localStorage.setItem(TRACK_KEY, String(idx)); } catch {} if (musicOn) playTrackIdx(idx); };
-  useEffect(() => () => stopMusic(), []);
-  useEffect(() => { if (phase !== "rest" && musicOn) { stopMusic(); setMusicOn(false); } }, [phase]);
   const cur = day.exercises[ei]; const ex = exercises[cur?.exercise_id];
   const parseReps = (r: string) => parseInt(r) || 10;
 
@@ -171,15 +128,10 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
 
   if (phase === "rest") { const pct = restTotal ? rest / restTotal : 0; const R = 104, C = 2 * Math.PI * R; return (
     <div className="screen no-nav fade" style={{ textAlign: "center" }}>
-      <audio ref={audioElRef} loop />
       <div className="row between">
         <button className="btn ghost sm" style={{ width: "auto" }} onClick={goBack}>← Назад</button>
-        <button className="btn ghost sm" style={{ width: "auto" }} onClick={toggleMusic}>{musicOn ? "♪ Пауза" : "♪ Музыка"}</button>
+        <span />
       </div>
-      {musicOn && <div className="row between" style={{ marginTop: 8 }}>
-        <span style={{ fontSize: 13, color: "var(--muted)" }}>{TRACKS[trackIdx].title}</span>
-        <button className="btn ghost sm" style={{ width: "auto" }} onClick={nextTrack}>Следующий трек ⏭</button>
-      </div>}
       <div className="eyebrow" style={{ marginTop: 24 }}>Отдых</div>
       <div className="timer-ring"><svg viewBox="0 0 240 240" width="100%"><circle cx="120" cy="120" r={R} fill="none" stroke="var(--line)" strokeWidth="10" /><circle cx="120" cy="120" r={R} fill="none" stroke="var(--accent)" strokeWidth="10" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - pct)} style={{ transition: "stroke-dashoffset 1s linear" }} /></svg>
         <div className="n"><div className="big" style={{ fontSize: 72 }}>{rest}</div><div style={{ color: "var(--muted)" }}>секунд</div></div></div>
