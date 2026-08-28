@@ -27,6 +27,7 @@ class User(Base):
     remind_progress: Mapped[bool] = mapped_column(Boolean, default=True)
     workout_time: Mapped[str] = mapped_column(String(5), default="18:00")
     timezone_offset: Mapped[int] = mapped_column(Integer, default=180)  # минуты от UTC
+    taplink_url: Mapped[str | None] = mapped_column(String(256))
 
 class Program(Base):
     __tablename__ = "programs"

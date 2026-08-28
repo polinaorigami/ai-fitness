@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, User, ProgramT, Today, Exercise, Day } from "./api";
 import { initTelegram, tzOffset } from "./tg";
+import { initTheme } from "./theme";
 import { Nav, Loading, Btn, Err } from "./components/UI";
 import Welcome from "./screens/Welcome"; import Onboarding from "./screens/Onboarding"; import Photos from "./screens/Photos"; import Analysis from "./screens/Analysis";
 import Home from "./screens/Home"; import Schedule from "./screens/Schedule"; import Workout from "./screens/Workout"; import Progress from "./screens/Progress"; import Profile from "./screens/Profile"; import Coach from "./screens/Coach";
@@ -17,7 +18,7 @@ export default function App() {
   const [err, setErr] = useState("");
 
   const refresh = async () => { const [p, t] = await Promise.all([api.program(), api.today()]); setProgram(p); setToday(t); };
-  useEffect(() => { initTelegram(); (async () => {
+  useEffect(() => { initTelegram(); initTheme(); (async () => {
     try {
       const [u, ex] = await Promise.all([api.me(), api.exercises()]);
       setUser(u); setExercises(Object.fromEntries(ex.map(e => [e.id, e])));

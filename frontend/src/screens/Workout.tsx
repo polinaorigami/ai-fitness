@@ -16,7 +16,29 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
   const [fin, setFin] = useState<Finish | null>(null);
   const [rpe, setRpe] = useState(5); const [hard, setHard] = useState(""); const [easy, setEasy] = useState(""); const [fbMsg, setFbMsg] = useState("");
   const [how, setHow] = useState(false); const [err, setErr] = useState("");
+  const [musicOn, setMusicOn] = useState(false);
+  const audioRef = useRef<{ ctx: AudioContext; nodes: (OscillatorNode | GainNode)[] } | null>(null);
   const start = useRef(Date.now());
+
+  const startMusic = () => {
+    if (audioRef.current) return;
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const master = ctx.createGain(); master.gain.value = 0.06; master.connect(ctx.destination);
+    const notes = [174.61, 220, 261.63]; // спокойный эмбиент-аккорд, без внешних треков
+    const nodes: (OscillatorNode | GainNode)[] = [master];
+    notes.forEach((f, i) => {
+      const osc = ctx.createOscillator(); osc.type = "sine"; osc.frequency.value = f;
+      const g = ctx.createGain(); g.gain.value = 0;
+      osc.connect(g); g.connect(master); osc.start();
+      g.gain.linearRampToValueAtTime(1 / notes.length, ctx.currentTime + 1.5 + i * 0.3);
+      nodes.push(osc, g);
+    });
+    audioRef.current = { ctx, nodes };
+  };
+  const stopMusic = () => { audioRef.current?.ctx.close(); audioRef.current = null; };
+  const toggleMusic = () => { musicOn ? stopMusic() : startMusic(); setMusicOn(!musicOn); };
+  useEffect(() => () => stopMusic(), []);
+  useEffect(() => { if (phase !== "rest" && musicOn) { stopMusic(); setMusicOn(false); } }, [phase]);
   const cur = day.exercises[ei]; const ex = exercises[cur?.exercise_id];
   const parseReps = (r: string) => parseInt(r) || 10;
 
@@ -35,6 +57,13 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
     else nextExercise();
   };
   const nextExercise = () => { if (ei + 1 < day.exercises.length) { setEi(ei + 1); setSi(1); setPhase("exercise"); } else finishAll(); };
+  const goBack = () => {
+    if (phase === "rest") { setPhase("set"); return; }
+    if (si > 1) { setSi(si - 1); setPhase("exercise"); return; }
+    if (ei > 0) { setEi(ei - 1); setSi(day.exercises[ei - 1].sets); setPhase("exercise"); return; }
+    setPhase("overview");
+  };
+  const canGoBack = phase === "rest" || si > 1 || ei > 0 || phase === "exercise";
   const finishAll = async (partial?: Log[]) => {
     const all = partial ?? logs;
     try { const r = await api.sessionFinish(sid!, { duration_sec: Math.round((Date.now() - start.current) / 1000), sets: all }); setFin(r); setPhase("finish"); notify("success"); }
@@ -62,7 +91,13 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
 
   if (phase === "exercise" || phase === "set") return (
     <div className="screen no-nav fade" key={`${ei}-${si}-${phase}`}>
-      <div className="row between"><button className="btn ghost sm" onClick={() => { if (confirm("Завершить тренировку досрочно? Выполненные подходы сохранятся.")) finishAll(); }}>Завершить</button><span className="eyebrow">{ei + 1} / {day.exercises.length} упражнений</span></div>
+      <div className="row between">
+        <div className="row" style={{ gap: 8 }}>
+          {canGoBack && <button className="btn ghost sm" onClick={goBack}>← Назад</button>}
+          <button className="btn ghost sm" onClick={() => { if (confirm("Завершить тренировку досрочно? Выполненные подходы сохранятся.")) finishAll(); }}>Завершить</button>
+        </div>
+        <span className="eyebrow">{ei + 1} / {day.exercises.length} упражнений</span>
+      </div>
       <div className="progressbar" style={{ margin: "12px 0 20px" }}><i style={{ width: `${((ei + (si - 1) / cur.sets) / day.exercises.length) * 100}%` }} /></div>
       <div className="eyebrow">{day.title}</div>
       <h1 className="display" style={{ fontSize: 30 }}>{ex?.name.toUpperCase() || cur.name}</h1>
@@ -93,11 +128,16 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
 
   if (phase === "rest") { const pct = restTotal ? rest / restTotal : 0; const R = 104, C = 2 * Math.PI * R; return (
     <div className="screen no-nav fade" style={{ textAlign: "center" }}>
-      <div className="eyebrow" style={{ marginTop: 40 }}>Отдых</div>
+      <div className="row between">
+        <button className="btn ghost sm" style={{ width: "auto" }} onClick={goBack}>← Назад</button>
+        <button className="btn ghost sm" style={{ width: "auto" }} onClick={toggleMusic}>{musicOn ? "♪ Музыка вкл" : "♪ Музыка"}</button>
+      </div>
+      <div className="eyebrow" style={{ marginTop: 24 }}>Отдых</div>
       <div className="timer-ring"><svg viewBox="0 0 240 240" width="100%"><circle cx="120" cy="120" r={R} fill="none" stroke="var(--line)" strokeWidth="10" /><circle cx="120" cy="120" r={R} fill="none" stroke="var(--accent)" strokeWidth="10" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - pct)} style={{ transition: "stroke-dashoffset 1s linear" }} /></svg>
         <div className="n"><div className="big" style={{ fontSize: 72 }}>{rest}</div><div style={{ color: "var(--muted)" }}>секунд</div></div></div>
       {rest > 0 ? (<div className="grid2"><Btn kind="ghost" onClick={() => { setRest(rest + 15); setRestTotal(restTotal + 15); }}>+15 секунд</Btn><Btn kind="ghost" onClick={() => setRest(0)}>Пропустить</Btn></div>)
-        : (<><h1 className="display" style={{ fontSize: 30 }}>ГОТОВЫ?</h1><p className="sub">Следующий: подход {si + 1} из {cur.sets} · {ex?.name}</p><Btn kind="accent" onClick={() => { setSi(si + 1); setPhase("set"); }}>Начать следующий подход</Btn></>)}
+        : (<><h1 className="display" style={{ fontSize: 30 }}>ГОТОВЫ?</h1><p className="sub">Следующий: подход {si + 1} из {cur.sets} · {ex?.name}</p>
+          <div className="stack"><Btn kind="accent" onClick={() => { setSi(si + 1); setPhase("set"); }}>Начать следующий подход</Btn><Btn kind="ghost" onClick={() => { setRest(restTotal); }}>Отдохнуть ещё раз</Btn></div></>)}
     </div>
   ); }
 

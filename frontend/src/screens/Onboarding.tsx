@@ -11,19 +11,27 @@ const LVL = [["beginner", "Новичок", "Меньше года регуля�
 export const EQUIP = [["machine", "Тренажёры"], ["dumbbell", "Гантели"], ["barbell", "Штанга"], ["kettlebell", "Гири"], ["band", "Резинки"], ["pullup_bar", "Турник"], ["mat", "Коврик"], ["bodyweight", "Собственный вес"], ["bench", "Скамья"], ["jump_rope", "Скакалка"]];
 const TOTAL = 8;
 
+const DRAFT_KEY = "aifitness_onboarding_draft";
+const loadDraft = () => { try { const raw = localStorage.getItem(DRAFT_KEY); if (raw) return JSON.parse(raw); } catch {} return { step: 1, data: { equipment: ["bodyweight"], sex: "" } }; };
+const saveDraft = (step: number, data: any) => { try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ step, data })); } catch {} };
+export const clearDraft = () => { try { localStorage.removeItem(DRAFT_KEY); } catch {} };
+
 export default function Onboarding({ onDone }: { onDone: () => void }) {
-  const [s, setS] = useState(1);
-  const [d, setD] = useState<any>({ equipment: ["bodyweight"], sex: "" });
+  const draft = loadDraft();
+  const [s, setS] = useState(draft.step);
+  const [d, setD] = useState<any>(draft.data);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
-  const set = (k: string, v: any) => setD({ ...d, [k]: v });
-  const pick = (k: string, v: any) => { set(k, v); setTimeout(() => setS(s + 1), 180); };
+  const goStep = (v: number) => { setS(v); saveDraft(v, d); };
+  const set = (k: string, v: any) => { const nd = { ...d, [k]: v }; setD(nd); saveDraft(s, nd); };
+  const pick = (k: string, v: any) => { const nd = { ...d, [k]: v }; setD(nd); saveDraft(s + 1, nd); setTimeout(() => setS(s + 1), 180); };
   const toggleEq = (v: string) => set("equipment", d.equipment.includes(v) ? d.equipment.filter((x: string) => x !== v) : [...d.equipment, v]);
 
   const finish = async () => {
     setErr(""); setBusy(true);
     try {
       await api.onboarding({ goal: d.goal, days_per_week: d.days_per_week, location: d.location, minutes: d.minutes, level: d.level, age: +d.age, height_cm: +d.height_cm, weight_kg: +d.weight_kg, sex: d.sex || null, equipment: d.equipment });
+      clearDraft();
       onDone();
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   };
@@ -36,19 +44,19 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     3: <><h1 className="display">Где ты тренируешься?</h1><div className="stack">{LOC.map(([k, ic, l]) => <Opt key={k} on={d.location === k} ic={ic} onClick={() => pick("location", k)}>{l}</Opt>)}</div></>,
     4: <><h1 className="display">Сколько времени у тебя есть на тренировку?</h1><div className="stack">{MIN.map(n => <Opt key={n} on={d.minutes === n} onClick={() => pick("minutes", n)}>{n === 75 ? "75+ минут" : `${n} минут`}</Opt>)}</div></>,
     5: <><h1 className="display">Какой у тебя опыт?</h1><div className="stack">{LVL.map(([k, l, h]) => <Opt key={k} on={d.level === k} onClick={() => pick("level", k)}><div>{l}<div style={{ fontSize: 13, color: "var(--muted)", fontWeight: 400 }}>{h}</div></div></Opt>)}</div></>,
-    6: <><h1 className="display">Твой возраст</h1><input type="number" inputMode="numeric" placeholder="Например, 28" value={d.age || ""} onChange={e => set("age", e.target.value)} /><div style={{ height: 20 }} /><Btn disabled={!(+d.age >= 12 && +d.age <= 100)} onClick={() => setS(7)}>Дальше</Btn></>,
+    6: <><h1 className="display">Твой возраст</h1><input type="number" inputMode="numeric" placeholder="Например, 28" value={d.age || ""} onChange={e => set("age", e.target.value)} /><div style={{ height: 20 }} /><Btn disabled={!(+d.age >= 12 && +d.age <= 100)} onClick={() => goStep(7)}>Дальше</Btn></>,
     7: <><h1 className="display">Твои параметры</h1><div className="stack">
         <div><div className="eyebrow" style={{ marginBottom: 6 }}>Рост, см</div><input type="number" inputMode="decimal" placeholder="170" value={d.height_cm || ""} onChange={e => set("height_cm", e.target.value)} /></div>
         <div><div className="eyebrow" style={{ marginBottom: 6 }}>Вес, кг</div><input type="number" inputMode="decimal" placeholder="65" value={d.weight_kg || ""} onChange={e => set("weight_kg", e.target.value)} /></div>
         <div><div className="eyebrow" style={{ marginBottom: 6 }}>Пол (по желанию)</div><div className="chips">{[["female", "Женский"], ["male", "Мужской"], ["", "Не указывать"]].map(([k, l]) => <button key={k} className={`chip ${d.sex === k ? "on" : ""}`} onClick={() => set("sex", k)}>{l}</button>)}</div></div>
-        <Btn disabled={!(+d.height_cm > 100 && +d.weight_kg > 25)} onClick={() => setS(8)}>Дальше</Btn></div></>,
+        <Btn disabled={!(+d.height_cm > 100 && +d.weight_kg > 25)} onClick={() => goStep(8)}>Дальше</Btn></div></>,
     8: <><h1 className="display">Какое оборудование тебе доступно?</h1><p className="sub">Можно выбрать несколько.</p><div className="chips" style={{ marginBottom: 24 }}>{EQUIP.map(([k, l]) => <button key={k} className={`chip ${d.equipment.includes(k) ? "on" : ""}`} onClick={() => { haptic(); toggleEq(k); }}>{l}</button>)}</div>{err && <Err e={err} />}<div style={{ height: 12 }} /><Btn kind="accent" disabled={busy || !d.equipment.length} onClick={finish}>{busy ? "Сохраняем…" : "Готово"}</Btn></>,
   };
 
   return (
     <div className="screen no-nav fade" key={s}>
       <div className="row between" style={{ marginBottom: 14 }}>
-        <button className="btn ghost sm" style={{ visibility: s > 1 ? "visible" : "hidden" }} onClick={() => setS(s - 1)}>Назад</button>
+        <button className="btn ghost sm" style={{ visibility: s > 1 ? "visible" : "hidden" }} onClick={() => goStep(s - 1)}>Назад</button>
         <span className="eyebrow">Шаг {s} из {TOTAL}</span>
       </div>
       <div className="progressbar" style={{ marginBottom: 24 }}><i style={{ width: `${(s / TOTAL) * 100}%` }} /></div>

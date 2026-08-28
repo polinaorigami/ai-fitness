@@ -45,8 +45,8 @@ h1.display{font-size:34px;margin:8px 0 10px}
 .nav{position:fixed;left:0;right:0;bottom:0;background:rgba(247,247,245,.92);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;padding:8px 8px calc(8px + var(--safe-b));max-width:480px;margin:0 auto}
 .nav button{flex:1;background:none;border:0;padding:8px 4px;font-size:11px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
 .nav button.on{color:var(--ink)}
-.nav .dot{width:22px;height:22px;border-radius:8px;background:var(--line)}
-.nav button.on .dot{background:var(--ink)}
+.nav button svg{color:var(--muted)}
+.nav button.on svg{color:var(--ink)}
 .ex-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
 .ex-row:last-child{border-bottom:0}
 .ex-num{font-family:var(--display);font-weight:700;color:var(--muted);font-size:14px;width:24px}
