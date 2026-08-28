@@ -1,11 +1,13 @@
 from datetime import datetime, date
-from sqlalchemy import String, Integer, Float, Boolean, DateTime, Date, JSON, ForeignKey, Text
+from sqlalchemy import String, Integer, BigInteger, Float, Boolean, DateTime, Date, JSON, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .db import Base
 
 class User(Base):
     __tablename__ = "users"
-    id: Mapped[int] = mapped_column(primary_key=True)          # Telegram user id
+    # Telegram user id. ОБЯЗАТЕЛЬНО BigInteger: современные Telegram id больше 2 147 483 647
+    # (лимит обычного INTEGER в Postgres), из-за чего запросы падали с "integer out of range".
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=False)
     first_name: Mapped[str] = mapped_column(String(128), default="")
     username: Mapped[str | None] = mapped_column(String(128))
     photo_url: Mapped[str | None] = mapped_column(String(512))
@@ -33,7 +35,7 @@ class User(Base):
 class Program(Base):
     __tablename__ = "programs"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     strategy: Mapped[dict] = mapped_column(JSON)
     week: Mapped[list] = mapped_column(JSON)
@@ -42,7 +44,7 @@ class Program(Base):
 class WorkoutSession(Base):
     __tablename__ = "sessions"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), index=True)
     day_index: Mapped[int] = mapped_column(Integer)
     title: Mapped[str] = mapped_column(String(64))
     started_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -60,7 +62,7 @@ class SetLog(Base):
     __tablename__ = "set_logs"
     id: Mapped[int] = mapped_column(primary_key=True)
     session_id: Mapped[int] = mapped_column(ForeignKey("sessions.id"), index=True)
-    user_id: Mapped[int] = mapped_column(Integer, index=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, index=True)
     exercise_id: Mapped[str] = mapped_column(String(64), index=True)
     set_number: Mapped[int] = mapped_column(Integer)
     weight_kg: Mapped[float] = mapped_column(Float, default=0)
@@ -71,7 +73,7 @@ class SetLog(Base):
 class Measurement(Base):
     __tablename__ = "measurements"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), index=True)
     date: Mapped[date] = mapped_column(Date, default=date.today)
     weight: Mapped[float | None] = mapped_column(Float)
     waist: Mapped[float | None] = mapped_column(Float)
@@ -83,7 +85,7 @@ class Measurement(Base):
 class Photo(Base):
     __tablename__ = "photos"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), index=True)
     kind: Mapped[str] = mapped_column(String(16), default="progress")
     label: Mapped[str] = mapped_column(String(32), default="")
     path: Mapped[str] = mapped_column(String(512))
@@ -93,7 +95,7 @@ class AppFeedback(Base):
     """Общая обратная связь по приложению (не по конкретной тренировке): нравится/не нравится + комментарий."""
     __tablename__ = "app_feedback"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), index=True)
     liked: Mapped[bool | None] = mapped_column(Boolean)
     comment: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -101,7 +103,7 @@ class AppFeedback(Base):
 class ChatMessage(Base):
     __tablename__ = "chat"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), index=True)
     role: Mapped[str] = mapped_column(String(8))
     text: Mapped[str] = mapped_column(Text)
     actions: Mapped[list] = mapped_column(JSON, default=list)
