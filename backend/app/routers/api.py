@@ -19,7 +19,7 @@ ai = get_provider()
 def _u(user: User):
     return {k: getattr(user, k) for k in ("id","first_name","username","photo_url","goal","days_per_week","location","minutes",
             "level","age","height_cm","weight_kg","sex","equipment","onboarded","remind_workout","remind_rest",
-            "weekly_report","remind_progress","workout_time","timezone_offset","taplink_url")}
+            "weekly_report","remind_progress","workout_time","timezone_offset","taplink_url","focus_zone")}
 
 def _program(db, uid):
     return db.scalar(select(Program).where(Program.user_id==uid, Program.active==True).order_by(Program.id.desc()))

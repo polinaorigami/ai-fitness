@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 class OnboardingIn(BaseModel):
     goal: str; days_per_week: int = Field(ge=2, le=6); location: str; minutes: int
     level: str; age: int = Field(ge=12, le=100); height_cm: float; weight_kg: float
-    sex: str | None = None; equipment: list[str] = []
+    sex: str | None = None; equipment: list[str] = []; focus_zone: str | None = None
 
 class SetIn(BaseModel):
     exercise_id: str; set_number: int; weight_kg: float = 0; reps: int = 0

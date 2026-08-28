@@ -35,6 +35,37 @@ FOCUS = {"weight_loss":["Ноги","Ягодицы","Пресс","Кардио"]
          "recomp":["Ноги","Ягодицы","Спина","Пресс"], "strength":["Ноги","Спина","Грудь"],
          "fitness":["Всё тело","Пресс","Мобильность"], "endurance":["Кардио","Ноги","Пресс"]}
 
+# Акцентная зона: если задана (не "full"), программа почти целиком строится вокруг неё,
+# а не по стандартному сплиту — так пользователь не получает дни на группы, которые не хочет качать.
+ZONE_LABEL = {"glutes": "Ягодицы", "abs": "Пресс", "arms": "Руки", "back": "Спина", "chest": "Грудь", "legs": "Ноги"}
+GROUP_LABEL = {"legs": "ноги", "back": "спина", "chest": "грудь", "abs": "пресс", "glutes": "ягодицы",
+               "cardio": "кардио", "shoulders": "плечи", "mobility": "мобильность", "biceps": "бицепс", "triceps": "трицепс"}
+ZONE_GROUPS = {
+    "glutes": ["glutes", "legs", "abs"],
+    "abs": ["abs", "cardio", "legs"],
+    "arms": ["biceps", "triceps", "shoulders"],
+    "back": ["back", "biceps", "abs"],
+    "chest": ["chest", "triceps", "shoulders"],
+    "legs": ["legs", "glutes", "abs"],
+}
+ZONE_VARIANTS = [
+    [(0, 3), (1, 2), (2, 1)],
+    [(0, 4), (1, 1), (2, 1)],
+    [(0, 3), (1, 1), (2, 2)],
+]
+
+def _zone_template(zone: str, days: int):
+    groups = ZONE_GROUPS[zone]
+    label = ZONE_LABEL[zone]
+    out = []
+    for i in range(days):
+        variant = ZONE_VARIANTS[i % len(ZONE_VARIANTS)]
+        plan = [(groups[gi], n) for gi, n in variant if gi < len(groups)]
+        second = GROUP_LABEL.get(groups[1], groups[1]) if len(groups) > 1 else ""
+        title = f"{label} · акцент" if i % 2 == 0 and second else f"{label} + {second}".strip(" +")
+        out.append((title, plan))
+    return out
+
 def _pick(pool, group, n, used, level):
     cands = [e for e in pool if e["group"] == group and e["id"] not in used
              and LEVEL_RANK[e["level"]] <= LEVEL_RANK[level]]
@@ -77,7 +108,9 @@ def generate(user) -> dict:
     level = user.level or "beginner"
     minutes = user.minutes or 45
     pool = available(user.equipment or [], user.location or "home")
-    template = SPLITS[days]
+    zone = getattr(user, "focus_zone", None)
+    zone = zone if zone in ZONE_GROUPS else None
+    template = _zone_template(zone, days) if zone else SPLITS[days]
     slots = DAY_SLOTS[days]
     week = [{"weekday": WEEKDAYS[i], "title": "Отдых", "rest": True, "exercises": []} for i in range(7)]
     for slot, (title, plan) in zip(slots, template):
@@ -85,11 +118,13 @@ def generate(user) -> dict:
         for group, n in plan:
             exs += _pick(pool, group, n, used, level)
         if len(exs) < 4:  # мало оборудования — добираем bodyweight
-            exs += _pick(pool, "abs", 1, used, level) + _pick(pool, "cardio", 1, used, level)
+            fallback = ZONE_GROUPS[zone][0] if zone else "abs"
+            exs += _pick(pool, fallback, 1, used, level) + _pick(pool, "cardio", 1, used, level)
         exs = _fit_time([_adapt(e, goal, level, user.weight_kg) for e in exs], minutes)
         for x in exs: x.update(name=BY_ID[x["exercise_id"]]["name"])
         week[slot] = {"weekday": WEEKDAYS[slot], "title": title, "rest": False, "exercises": exs}
-    strategy = {"goal": goal, "goal_label": GOAL_LABEL[goal], "days": days, "focus": FOCUS[goal],
+    focus = [ZONE_LABEL[zone]] if zone else FOCUS[goal]
+    strategy = {"goal": goal, "goal_label": GOAL_LABEL[goal], "days": days, "focus": focus,
                 "avg_minutes": minutes, "level": level,
                 "progression": "Если все подходы выполнены с запасом (RPE ≤ 6) — на следующей тренировке +2,5 кг на штанге или +1–2 повторения.",
                 "source": "template"}

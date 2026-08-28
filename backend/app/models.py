@@ -28,6 +28,7 @@ class User(Base):
     workout_time: Mapped[str] = mapped_column(String(5), default="18:00")
     timezone_offset: Mapped[int] = mapped_column(Integer, default=180)  # минуты от UTC
     taplink_url: Mapped[str | None] = mapped_column(String(256))
+    focus_zone: Mapped[str | None] = mapped_column(String(16))  # акцентная зона: glutes/abs/arms/back/chest/legs/full
 
 class Program(Base):
     __tablename__ = "programs"
