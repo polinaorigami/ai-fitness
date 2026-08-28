@@ -35,6 +35,16 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
     try { await api.settings({ focus_zone: id }); await api.generate(); location.reload(); }
     catch { setZoneBusy(false); }
   };
+  const [fbLiked, setFbLiked] = useState<boolean | null>(null);
+  const [fbComment, setFbComment] = useState("");
+  const [fbSent, setFbSent] = useState(false);
+  const [fbBusy, setFbBusy] = useState(false);
+  const sendFeedback = async () => {
+    if (fbLiked === null && !fbComment.trim()) return;
+    setFbBusy(true);
+    try { await api.appFeedback({ liked: fbLiked, comment: fbComment.trim() }); setFbSent(true); setFbComment(""); }
+    catch {} finally { setFbBusy(false); }
+  };
   const del = async (what: "photos" | "history" | "account") => {
     const q = { photos: "Удалить все фотографии? Это нельзя отменить.", history: "Удалить всю историю тренировок, замеры и чат?", account: "Удалить аккаунт и все данные полностью?" }[what];
     if (!confirm(q)) return; setBusy(what);
@@ -97,6 +107,18 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Уведомления</div>
       <Card><div className="toggle"><span>Время тренировки</span><input type="time" value={user.workout_time} onChange={e => time(e.target.value)} style={{ width: 120, padding: "8px 12px", fontSize: 16 }} /></div>
         <Sw l="Напоминания о тренировках" k="remind_workout" /><Sw l="Напоминания об отдыхе" k="remind_rest" /><Sw l="Еженедельный отчёт" k="weekly_report" /><Sw l="Напоминания о прогрессе" k="remind_progress" /></Card>
+      <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Обратная связь</div>
+      <Card>
+        <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 12 }}>Нравится приложение? Что улучшить?</div>
+        <div className="row" style={{ gap: 10, marginBottom: 12 }}>
+          <button className={`chip ${fbLiked === true ? "on" : ""}`} onClick={() => setFbLiked(fbLiked === true ? null : true)}>👍 Нравится</button>
+          <button className={`chip ${fbLiked === false ? "on" : ""}`} onClick={() => setFbLiked(fbLiked === false ? null : false)}>👎 Не очень</button>
+        </div>
+        <textarea value={fbComment} onChange={e => { setFbComment(e.target.value); setFbSent(false); }} placeholder="Расскажи подробнее (необязательно)…"
+          style={{ width: "100%", minHeight: 72, border: "1px solid var(--line)", borderRadius: 14, padding: "12px 14px", background: "var(--card)",
+            color: "var(--ink)", fontFamily: "var(--body)", fontSize: 15, resize: "vertical", marginBottom: 12 }} />
+        <Btn kind="ghost" disabled={fbBusy || (fbLiked === null && !fbComment.trim())} onClick={sendFeedback}>{fbSent ? "Спасибо! ✓" : "Отправить"}</Btn>
+      </Card>
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>О создателе</div>
       <Card>
         <div style={{ textAlign: "center" }}>

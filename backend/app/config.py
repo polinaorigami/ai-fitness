@@ -13,3 +13,6 @@ OPENAI_COMPAT_KEY = os.getenv("OPENAI_COMPAT_KEY", "")
 OPENAI_COMPAT_MODEL = os.getenv("OPENAI_COMPAT_MODEL", "")
 DEV_SKIP_AUTH = os.getenv("DEV_SKIP_AUTH", "false").lower() == "true"
 UPLOAD_DIR = os.getenv("UPLOAD_DIR", "./uploads")
+# Telegram chat id создателя приложения — если задан, обратная связь из профиля будет
+# приходить сюда сообщением от бота. Необязательно: если пусто, просто сохраняется в базе.
+ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID", "")

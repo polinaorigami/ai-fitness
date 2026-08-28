@@ -1,17 +1,17 @@
-import os, uuid, shutil
+import os, uuid, shutil, httpx
 from datetime import datetime, date, timedelta
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from fastapi.responses import FileResponse
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from ..db import get_db
-from ..models import User, Program, WorkoutSession, SetLog, Measurement, Photo, ChatMessage
+from ..models import User, Program, WorkoutSession, SetLog, Measurement, Photo, ChatMessage, AppFeedback
 from ..telegram_auth import current_user
 from ..schemas import *
 from ..exercises import EXERCISES, BY_ID
 from ..program_generator import generate, WEEKDAYS
 from ..ai.provider import get_provider
-from ..config import UPLOAD_DIR
+from ..config import UPLOAD_DIR, BOT_TOKEN, ADMIN_CHAT_ID
 
 r = APIRouter(prefix="/api")
 ai = get_provider()
@@ -223,6 +223,21 @@ def delete_account(user: User = Depends(current_user), db: Session = Depends(get
     delete_photos(user, db); delete_history(user, db)
     for p in db.scalars(select(Program).where(Program.user_id==user.id)): db.delete(p)
     db.delete(user); db.commit(); return {"ok": True}
+
+# ---- обратная связь по приложению ----
+@r.post("/feedback")
+async def app_feedback(body: AppFeedbackIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    fb = AppFeedback(user_id=user.id, liked=body.liked, comment=body.comment.strip())
+    db.add(fb); db.commit()
+    if ADMIN_CHAT_ID and BOT_TOKEN:
+        mark = "👍" if body.liked is True else "👎" if body.liked is False else "💬"
+        text = f"{mark} Отзыв от {user.first_name} (@{user.username or '—'}, id {user.id})\n\n{body.comment.strip() or '(без комментария)'}"
+        try:
+            async with httpx.AsyncClient(timeout=5) as client:
+                await client.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", json={"chat_id": ADMIN_CHAT_ID, "text": text})
+        except Exception:
+            pass
+    return {"ok": True}
 
 # ---- AI-коуч ----
 @r.get("/coach")

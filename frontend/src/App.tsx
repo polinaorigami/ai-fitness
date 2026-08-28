@@ -5,6 +5,7 @@ import { initTheme } from "./theme";
 import { Nav, Loading, Btn, Err } from "./components/UI";
 import { NAV_ITEMS, NavId, getNavOrder } from "./navPrefs";
 import MusicWidget from "./musicWidget";
+import Tour, { tourSeen } from "./tour";
 import Welcome from "./screens/Welcome"; import Onboarding from "./screens/Onboarding"; import Photos from "./screens/Photos"; import Analysis from "./screens/Analysis";
 import Home from "./screens/Home"; import Schedule from "./screens/Schedule"; import Workout, { hasActiveSession, clearSession } from "./screens/Workout"; import Progress from "./screens/Progress"; import Profile from "./screens/Profile"; import Coach from "./screens/Coach";
 
@@ -19,6 +20,7 @@ export default function App() {
   const [wk, setWk] = useState<{ day: Day; index: number } | null>(null);
   const [err, setErr] = useState("");
   const [navOrder, setNavOrderState] = useState<NavId[]>(getNavOrder());
+  const [showTour, setShowTour] = useState(false);
 
   const refresh = async () => { const [p, t] = await Promise.all([api.program(), api.today()]); setProgram(p); setToday(t); };
   useEffect(() => { initTelegram(); initTheme(); (async () => {
@@ -46,6 +48,9 @@ export default function App() {
   };
   const tab = screen === "schedule" && !navOrder.includes("schedule") ? "workout" : screen;
   const navItems = navOrder.map(id => NAV_ITEMS.find(n => n.id === id)!).filter(Boolean);
+  useEffect(() => {
+    if (["home", "schedule", "progress", "profile"].includes(screen) && !tourSeen()) setShowTour(true);
+  }, [screen]);
 
   if (err) return <div className="screen no-nav"><h1 className="display">Не удалось подключиться</h1><Err e={err} /><div style={{ height: 12 }} /><Btn onClick={() => location.reload()}>Повторить</Btn></div>;
   if (screen === "loading" || !user) return <Loading />;
@@ -63,5 +68,6 @@ export default function App() {
     {screen === "progress" && <Progress />}
     {screen === "profile" && <Profile user={user} setUser={setUser} onRedo={() => { clearSession(); setScreen("onboarding"); }} onLogout={() => location.reload()} navOrder={navOrder} onNavChange={setNavOrderState} />}
     <Nav tab={tab} go={go} items={navItems} />
+    {showTour && <Tour onClose={() => setShowTour(false)} />}
   </>);
 }

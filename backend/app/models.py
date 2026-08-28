@@ -89,6 +89,15 @@ class Photo(Base):
     path: Mapped[str] = mapped_column(String(512))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
+class AppFeedback(Base):
+    """Общая обратная связь по приложению (не по конкретной тренировке): нравится/не нравится + комментарий."""
+    __tablename__ = "app_feedback"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    liked: Mapped[bool | None] = mapped_column(Boolean)
+    comment: Mapped[str] = mapped_column(Text, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
 class ChatMessage(Base):
     __tablename__ = "chat"
     id: Mapped[int] = mapped_column(primary_key=True)

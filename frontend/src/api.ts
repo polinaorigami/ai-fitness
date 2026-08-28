@@ -32,6 +32,7 @@ export const api = {
   deleteAccount: () => req("DELETE", "/api/account"),
   coachHistory: () => req<Msg[]>("GET", "/api/coach"),
   coach: (text: string) => req<Msg>("POST", "/api/coach", { text }),
+  appFeedback: (b: { liked?: boolean | null; comment?: string }) => req<{ ok: boolean }>("POST", "/api/feedback", b),
 };
 export type User = { id: number; first_name: string; username?: string; photo_url?: string; goal?: string; days_per_week?: number; location?: string; minutes?: number; level?: string; age?: number; height_cm?: number; weight_kg?: number; sex?: string; equipment: string[]; onboarded: boolean; remind_workout: boolean; remind_rest: boolean; weekly_report: boolean; remind_progress: boolean; workout_time: string; timezone_offset: number; taplink_url?: string; focus_zone?: string };
 export type Exercise = { id: string; name: string; group: string; group_label: string; equipment_labels: string[]; level_label: string; description: string; technique: string; mistakes: string; youtube_url: string | null };

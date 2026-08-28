@@ -29,3 +29,6 @@ class SettingsIn(BaseModel):
     weekly_report: bool | None = None; remind_progress: bool | None = None
     workout_time: str | None = None; timezone_offset: int | None = None
     taplink_url: str | None = None; focus_zone: str | None = None
+
+class AppFeedbackIn(BaseModel):
+    liked: bool | None = None; comment: str = ""

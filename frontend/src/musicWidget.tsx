@@ -1,6 +1,9 @@
 // Глобальный плеер музыки — доступен на любом экране приложения, не останавливается при
 // переходах между экранами/фазами тренировки. Кружок можно перетащить в любое место экрана —
 // позиция запоминается на устройстве.
+//
+// Тап по кружку с нотой открывает/закрывает панель плеера — сам он музыку не останавливает.
+// Внутри панели отдельная кнопка play/pause, а также «назад»/«вперёд» и список остальных треков.
 import { useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, CSSProperties } from "react";
 import { haptic } from "./tg";
@@ -25,6 +28,7 @@ const clamp = (p: { x: number; y: number }) => ({
 
 export default function MusicWidget() {
   const [on, setOn] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [trackIdx, setTrackIdx] = useState(loadTrackIdx());
   const [pos, setPos] = useState(() => clamp(loadPos() || { x: window.innerWidth - SIZE - 14, y: 14 + 40 }));
   const [dragging, setDragging] = useState(false);
@@ -57,11 +61,17 @@ export default function MusicWidget() {
   };
   const stopAll = () => { stopSynth(); audioRef.current?.pause(); };
 
-  const toggle = () => {
-    if (dragInfo.current?.moved) return; // это был драг, не клик
+  // Play/pause — отдельная кнопка внутри панели, никак не связана с открытием/закрытием панели.
+  const togglePlay = () => {
     haptic();
     const next = !on; setOn(next);
     if (next) playIdx(trackIdx); else stopAll();
+  };
+  // Тап по самому кружку — только открыть/закрыть панель, музыку не трогает.
+  const toggleExpanded = () => {
+    if (dragInfo.current?.moved) return; // это был драг, не клик
+    haptic();
+    setExpanded(e => !e);
   };
   const switchTrack = (dir: 1 | -1) => {
     haptic();
@@ -69,6 +79,13 @@ export default function MusicWidget() {
     setTrackIdx(idx);
     try { localStorage.setItem(TRACK_KEY, String(idx)); } catch {}
     if (on) playIdx(idx);
+  };
+  const pickTrack = (idx: number) => {
+    haptic();
+    if (idx === trackIdx) { togglePlay(); return; }
+    setTrackIdx(idx);
+    try { localStorage.setItem(TRACK_KEY, String(idx)); } catch {}
+    setOn(true); playIdx(idx);
   };
 
   useEffect(() => () => stopAll(), []);
@@ -91,7 +108,7 @@ export default function MusicWidget() {
     setTimeout(() => { dragInfo.current = null; }, 0);
   };
 
-  // Панель с названием трека и стрелками открывается в ту сторону экрана, где есть место.
+  // Панель открывается в ту сторону экрана, где есть место.
   const openUp = pos.y > window.innerHeight / 2;
   const openLeft = pos.x > window.innerWidth / 2;
 
@@ -100,19 +117,40 @@ export default function MusicWidget() {
       <audio ref={audioRef} loop />
       <button
         onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
-        onClick={toggle} aria-label="Музыка"
-        style={{ width: SIZE, height: SIZE, borderRadius: "50%", border: "none", cursor: dragging ? "grabbing" : "grab",
-          background: on ? "var(--accent)" : "var(--card)", color: on ? "var(--accent-ink)" : "var(--ink)",
+        onClick={toggleExpanded} aria-label="Плеер"
+        style={{ width: SIZE, height: SIZE, borderRadius: "50%", border: "none", cursor: dragging ? "grabbing" : "grab", position: "relative",
+          background: expanded ? "var(--accent)" : "var(--card)", color: expanded ? "var(--accent-ink)" : "var(--ink)",
           boxShadow: "var(--shadow)", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", touchAction: "none" }}>
         ♪
+        {on && (
+          <span style={{ position: "absolute", top: -1, right: -1, width: 10, height: 10, borderRadius: "50%",
+            background: "var(--ok)", border: "2px solid var(--bg)" }} />
+        )}
       </button>
-      {on && (
+      {expanded && (
         <div style={{ position: "absolute", [openUp ? "bottom" : "top"]: SIZE + 8, [openLeft ? "right" : "left"]: 0,
-            background: "var(--card)", boxShadow: "var(--shadow)", borderRadius: 14, padding: "8px 10px",
-            display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" } as CSSProperties}>
-          <button onClick={() => switchTrack(-1)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 14 }} aria-label="Предыдущий трек">⏮</button>
-          <span style={{ fontSize: 12, maxWidth: 130, overflow: "hidden", textOverflow: "ellipsis" }}>{TRACKS[trackIdx].title}</span>
-          <button onClick={() => switchTrack(1)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 14 }} aria-label="Следующий трек">⏭</button>
+            background: "var(--card)", boxShadow: "var(--shadow)", borderRadius: 16, padding: 10, width: 220 } as CSSProperties}>
+          <div className="row between" style={{ gap: 6, marginBottom: 8 }}>
+            <button onClick={() => switchTrack(-1)} aria-label="Предыдущий трек"
+              style={{ border: "none", background: "var(--bg)", borderRadius: 10, width: 34, height: 34, cursor: "pointer", fontSize: 14, color: "var(--ink)" }}>⏮</button>
+            <button onClick={togglePlay} aria-label={on ? "Пауза" : "Играть"}
+              style={{ border: "none", background: "var(--accent)", color: "var(--accent-ink)", borderRadius: 10, width: 40, height: 34, cursor: "pointer", fontSize: 15 }}>
+              {on ? "⏸" : "▶"}
+            </button>
+            <button onClick={() => switchTrack(1)} aria-label="Следующий трек"
+              style={{ border: "none", background: "var(--bg)", borderRadius: 10, width: 34, height: 34, cursor: "pointer", fontSize: 14, color: "var(--ink)" }}>⏭</button>
+          </div>
+          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6, textAlign: "center" }}>{TRACKS[trackIdx].title}</div>
+          <div style={{ maxHeight: 140, overflowY: "auto" }}>
+            {TRACKS.map((t, i) => (
+              <button key={t.id} onClick={() => pickTrack(i)}
+                style={{ display: "flex", alignItems: "center", gap: 6, width: "100%", textAlign: "left", border: "none",
+                  background: i === trackIdx ? "var(--accent-soft)" : "transparent", color: i === trackIdx ? "var(--accent)" : "var(--ink)",
+                  borderRadius: 8, padding: "6px 8px", fontSize: 12, cursor: "pointer", marginBottom: 2 }}>
+                {i === trackIdx && on ? "▶" : "♪"} {t.title}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>

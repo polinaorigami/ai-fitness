@@ -19,6 +19,8 @@ services:
         value: https://ai-fitness-frontend-a70h.onrender.com
       - key: DATABASE_URL
         sync: false            # postgresql+psycopg://... из Neon/Supabase — вставить в дашборде Render (см. DEPLOY.md)
+      - key: ADMIN_CHAT_ID
+        sync: false            # необязательно: твой Telegram id, чтобы отзывы из профиля приходили тебе в бот
       - key: AI_PROVIDER
         value: rules
       - key: OLLAMA_URL
