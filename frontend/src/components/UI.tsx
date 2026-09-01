@@ -26,7 +26,13 @@ export const Stepper = ({ value, step, min = 0, onChange, unit }: { value: numbe
     <button onClick={() => { haptic(); onChange(+(value + step).toFixed(1)); }}>+</button>
   </div>
 );
-export const Loading = ({ text = "Загружаем…" }: { text?: string }) => <div className="screen no-nav" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}><div className="pulse eyebrow">{text}</div></div>;
+export const Loading = ({ text }: { text?: string }) => (
+  <div className="splash">
+    <div className="logo">AI <b>FITNESS</b></div>
+    <div className="tag">{text || "Move · Recover · Become"}</div>
+    <div className="load"><i /></div>
+  </div>
+);
 export const Err = ({ e }: { e: string }) => <div className="err">{e}</div>;
 export const greet = () => { const h = new Date().getHours(); return h < 5 ? "Доброй ночи" : h < 12 ? "Доброе утро" : h < 18 ? "Добрый день" : "Добрый вечер"; };
 export const fmtMin = (s: number) => `${Math.round(s / 60)} мин`;
