@@ -31,6 +31,8 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
   const [fin, setFin] = useState<Finish | null>(null);
   const [rpe, setRpe] = useState(5); const [hard, setHard] = useState(""); const [easy, setEasy] = useState(""); const [fbMsg, setFbMsg] = useState("");
   const [how, setHow] = useState(false); const [err, setErr] = useState("");
+  const [showRemoveExercise, setShowRemoveExercise] = useState(false);
+  const [visibleExercises, setVisibleExercises] = useState<number[]>(day.exercises.map((_, i) => i));
   const start = useRef(resumed?.startedAt ?? Date.now());
   const cur = day.exercises[ei]; const ex = exercises[cur?.exercise_id];
   const parseReps = (r: string) => parseInt(r) || 10;
@@ -57,6 +59,11 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
     else nextExercise();
   };
   const nextExercise = () => { if (ei + 1 < day.exercises.length) { setEi(ei + 1); setSi(1); setPhase("exercise"); } else finishAll(); };
+  const removeExercise = () => {
+    setVisibleExercises(v => v.filter(i => i !== ei));
+    setShowRemoveExercise(false);
+    nextExercise();
+  };
   const goBack = () => {
     if (phase === "rest") { setPhase("set"); return; }
     if (si > 1) { setSi(si - 1); setPhase("exercise"); return; }
@@ -108,11 +115,12 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
           <div className="stat"><div className="v">{cur.rest_sec}<span style={{ fontSize: 14 }}> с</span></div><div className="l">отдых</div></div>
           <div className="stat"><div className="v">{cur.weight_kg || "—"}{cur.weight_kg ? <span style={{ fontSize: 14 }}> кг</span> : ""}</div><div className="l">{cur.weight_kg ? "вес" : "свой вес"}</div></div>
         </div>
-        {how && ex && <Card><div className="eyebrow">Техника</div><p style={{ fontSize: 15 }}>{ex.technique}</p><div className="eyebrow">Типичные ошибки</div><p style={{ fontSize: 15, color: "var(--muted)" }}>{ex.mistakes}</p></Card>}
+        {how && ex && <Card><div className="eyebrow">📖 Техника выполнения</div><p style={{ fontSize: 15, marginTop: 10, marginBottom: 16, lineHeight: 1.6 }}>{ex.technique}</p><div className="eyebrow" style={{ marginTop: 16 }}>⚠️ Типичные ошибки</div><p style={{ fontSize: 15, color: "var(--muted)", marginTop: 10, lineHeight: 1.6 }}>{ex.mistakes}</p></Card>}
         <div className="stack">
           <Btn kind="accent" onClick={() => setPhase("set")}>Начать подход {si}</Btn>
-          <Btn kind="ghost" onClick={() => setHow(!how)}>{how ? "Скрыть" : "Как выполнять"}</Btn>
+          <Btn kind="ghost" onClick={() => setHow(!how)}>{how ? "▲ Скрыть" : "▼ Как выполнять"}</Btn>
           <Video />
+          <Btn kind="ghost" onClick={() => setShowRemoveExercise(true)}>Пропустить упражнение</Btn>
         </div>
       </>) : (<>
         <div className="eyebrow" style={{ margin: "6px 0 14px" }}>Подход {si} из {cur.sets}</div>
@@ -126,31 +134,76 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
     </div>
   );
 
-  if (phase === "rest") { const pct = restTotal ? rest / restTotal : 0; const R = 104, C = 2 * Math.PI * R; return (
-    <div className="screen no-nav fade" style={{ textAlign: "center" }}>
-      <div className="row between">
-        <button className="btn ghost sm" style={{ width: "auto" }} onClick={goBack}>← Назад</button>
-        <span />
+  if (phase === "rest") {
+    const pct = restTotal ? rest / restTotal : 0;
+    const R = 104;
+    const C = 2 * Math.PI * R;
+    return (
+      <div className="screen no-nav fade" style={{ textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <div className="row between" style={{ position: "absolute", top: 0, left: 0, right: 0, padding: "12px 18px" }}>
+          <button className="btn ghost sm" style={{ width: "auto" }} onClick={goBack}>← Назад</button>
+          <button className="btn ghost sm" style={{ width: "auto" }} onClick={() => setRest(0)}>Пропустить</button>
+        </div>
+        <div className="eyebrow" style={{ marginBottom: 8 }}>⏱️ ОТДЫХАЕМ</div>
+        <div className="timer-ring">
+          <svg viewBox="0 0 240 240" width="100%">
+            <circle cx="120" cy="120" r={R} fill="none" stroke="var(--line)" strokeWidth="10" />
+            <circle cx="120" cy="120" r={R} fill="none" stroke="var(--accent)" strokeWidth="10" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - pct)} style={{ transition: "stroke-dashoffset 1s linear" }} />
+          </svg>
+          <div className="n">
+            <div className="big" style={{ fontSize: 72, fontFamily: "var(--display)" }}>{rest}</div>
+            <div style={{ color: "var(--muted)", fontSize: 14 }}>секунд</div>
+          </div>
+        </div>
+        {rest > 0 ? (
+          <>
+            <p className="sub" style={{ marginTop: 16, marginBottom: 20 }}>Следующий: подход {si + 1} из {cur.sets}</p>
+            <div className="grid2" style={{ marginTop: 20 }}>
+              <Btn kind="ghost" onClick={() => { setRest(rest + 15); setRestTotal(restTotal + 15); }}>+15 сек</Btn>
+              <Btn kind="accent" onClick={() => setRest(0)}>Готов</Btn>
+            </div>
+          </>
+        ) : (
+          <>
+            <h1 className="display" style={{ fontSize: 34, marginTop: 16 }}>ГОТОВЫ?</h1>
+            <p className="sub">Начинаем подход {si + 1} из {cur.sets}</p>
+            <div className="stack" style={{ marginTop: 20 }}>
+              <Btn kind="accent" onClick={() => { setSi(si + 1); setPhase("set"); }}>Начать подход</Btn>
+              <Btn kind="ghost" onClick={() => { setRest(restTotal); }}>Отдохнуть ещё</Btn>
+            </div>
+          </>
+        )}
       </div>
-      <div className="eyebrow" style={{ marginTop: 24 }}>Отдых</div>
-      <div className="timer-ring"><svg viewBox="0 0 240 240" width="100%"><circle cx="120" cy="120" r={R} fill="none" stroke="var(--line)" strokeWidth="10" /><circle cx="120" cy="120" r={R} fill="none" stroke="var(--accent)" strokeWidth="10" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - pct)} style={{ transition: "stroke-dashoffset 1s linear" }} /></svg>
-        <div className="n"><div className="big" style={{ fontSize: 72 }}>{rest}</div><div style={{ color: "var(--muted)" }}>секунд</div></div></div>
-      {rest > 0 ? (<div className="grid2"><Btn kind="ghost" onClick={() => { setRest(rest + 15); setRestTotal(restTotal + 15); }}>+15 секунд</Btn><Btn kind="ghost" onClick={() => setRest(0)}>Пропустить</Btn></div>)
-        : (<><h1 className="display" style={{ fontSize: 30 }}>ГОТОВЫ?</h1><p className="sub">Следующий: подход {si + 1} из {cur.sets} · {ex?.name}</p>
-          <div className="stack"><Btn kind="accent" onClick={() => { setSi(si + 1); setPhase("set"); }}>Начать следующий подход</Btn><Btn kind="ghost" onClick={() => { setRest(restTotal); }}>Отдохнуть ещё раз</Btn></div></>)}
-    </div>
-  ); }
+    );
+  }
 
   if (phase === "finish" && fin) return (
     <div className="screen no-nav fade">
       <div className="eyebrow" style={{ marginTop: 20 }}>Готово</div>
-      <h1 className="display" style={{ fontSize: 34 }}>ТРЕНИРОВКА ЗАВЕРШЕНА 🔥</h1>
+      <h1 className="display" style={{ fontSize: 34, animation: "pulse 0.8s ease" }}>ТРЕНИРОВКА ЗАВЕРШЕНА 🔥</h1>
       <div className="grid2" style={{ margin: "20px 0" }}>
-        <Stat v={fmtMin(fin.duration_sec)} l="продолжительность" /><Stat v={fin.exercises} l="упражнений" />
-        <Stat v={fin.sets_done} l={`подходов из ${fin.sets_total}`} /><Stat v={`${fin.percent}%`} l="выполнено" />
+        <Stat v={fmtMin(fin.duration_sec)} l="продолжительность" style={{ animation: "slideInUp 0.4s ease both" }} />
+        <Stat v={fin.exercises} l="упражнений" style={{ animation: "slideInUp 0.4s ease 0.1s both" }} />
+        <Stat v={fin.sets_done} l={`подходов из ${fin.sets_total}`} style={{ animation: "slideInUp 0.4s ease 0.2s both" }} />
+        <Stat v={`${fin.percent}%`} l="выполнено" style={{ animation: "slideInUp 0.4s ease 0.3s both" }} />
       </div>
-      <Card accent><div className="eyebrow">Серия</div><div className="big">🔥 {fin.streak}</div></Card>
+      <Card accent style={{ animation: "slideInUp 0.4s ease 0.4s both" }}>
+        <div className="eyebrow">Серия</div>
+        <div className="big">🔥 {fin.streak}</div>
+      </Card>
       <Btn kind="accent" onClick={() => setPhase("feedback")}>Дальше</Btn>
+      <style>{`
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 
@@ -168,5 +221,28 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
       </div>
     </div>
   );
+
+  // Remove exercise confirmation modal
+  if (showRemoveExercise && cur) {
+    return (
+      <div className="screen no-nav fade" style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+        <div style={{ position: "fixed", inset: 0, background: "var(--sheet-scrim)", zIndex: 100 }} onClick={() => setShowRemoveExercise(false)} />
+        <div style={{ position: "relative", zIndex: 101, background: "var(--bg)", borderRadius: "20px 20px 0 0", padding: "24px 18px", paddingBottom: "calc(24px + var(--safe-b))" }}>
+          <div style={{ textAlign: "center", marginBottom: 20 }}>
+            <h2 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 8px" }}>Пропустить упражнение?</h2>
+            <p style={{ fontSize: 14, color: "var(--muted)", margin: 0 }}>{cur.name}</p>
+          </div>
+          <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 20, lineHeight: 1.5, textAlign: "center" }}>
+            Это упражнение будет исключено из тренировки. Выполненные подходы не сохранятся.
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <Btn kind="ghost" onClick={() => setShowRemoveExercise(false)} style={{ flex: 1 }}>Отмена</Btn>
+            <Btn kind="danger" onClick={removeExercise} style={{ flex: 1 }}>Пропустить</Btn>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return null;
 }

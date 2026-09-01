@@ -7,9 +7,32 @@ import { NAV_ITEMS, NavId, getNavOrder } from "./navPrefs";
 import MusicWidget from "./musicWidget";
 import Tour, { tourSeen } from "./tour";
 import Welcome from "./screens/Welcome"; import Onboarding from "./screens/Onboarding"; import Photos from "./screens/Photos"; import Analysis from "./screens/Analysis";
-import Home from "./screens/Home"; import Schedule from "./screens/Schedule"; import Workout, { hasActiveSession, clearSession } from "./screens/Workout"; import Progress from "./screens/Progress"; import Profile from "./screens/Profile"; import Coach from "./screens/Coach";
+import WhatsNew from "./screens/WhatsNew";
+import Home from "./screens/Home"; import Schedule from "./screens/Schedule"; import Workout, { hasActiveSession, clearSession } from "./screens/Workout"; import Progress from "./screens/Progress"; import Profile from "./screens/Profile"; import Coach from "./screens/Coach"; import Friends from "./screens/Friends"; import Mind from "./screens/Mind"; import Achievements from "./screens/Achievements";
 
-type Screen = "loading" | "welcome" | "onboarding" | "photos" | "analysis" | "home" | "schedule" | "workout" | "progress" | "profile" | "coach";
+type Screen = "loading" | "welcome" | "onboarding" | "photos" | "analysis" | "whatsnew" | "home" | "schedule" | "workout" | "progress" | "friends" | "mind" | "achievements" | "profile" | "coach";
+
+const WHATSNEW_KEY = "aifitness_whatsnew_seen";
+const WHATSNEW_HOURS = 4; // Show WhatsNew if app hasn't been opened for 4+ hours
+
+function shouldShowWhatsNew(): boolean {
+  try {
+    const lastSeen = localStorage.getItem(WHATSNEW_KEY);
+    if (!lastSeen) return true; // First time
+    const lastTime = parseInt(lastSeen, 10);
+    const now = Date.now();
+    const hoursSinceLastSeen = (now - lastTime) / (1000 * 60 * 60);
+    return hoursSinceLastSeen >= WHATSNEW_HOURS;
+  } catch {
+    return true;
+  }
+}
+
+function markWhatsNewSeen() {
+  try {
+    localStorage.setItem(WHATSNEW_KEY, Date.now().toString());
+  } catch {}
+}
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("loading");
@@ -35,7 +58,13 @@ export default function App() {
         const activeDay = hasActiveSession();
         if (activeDay !== null && p.week[activeDay] && !p.week[activeDay].rest) {
           setWk({ day: p.week[activeDay], index: activeDay }); setScreen("workout");
-        } else setScreen("home");
+        } else {
+          if (shouldShowWhatsNew()) {
+            setScreen("whatsnew");
+          } else {
+            setScreen("home");
+          }
+        }
       } catch { setScreen("analysis"); }
     } catch (e: any) { setErr(e.message); }
   })(); }, []);
@@ -57,7 +86,8 @@ export default function App() {
   if (screen === "welcome") return <Welcome onNext={() => setScreen("onboarding")} />;
   if (screen === "onboarding") return <><MusicWidget /><Onboarding onDone={async () => { setUser(await api.me()); setScreen("photos"); }} /></>;
   if (screen === "photos") return <><MusicWidget /><Photos onDone={() => setScreen("analysis")} /></>;
-  if (screen === "analysis") return <><MusicWidget /><Analysis onDone={async () => { await refresh(); setScreen("home"); }} /></>;
+  if (screen === "analysis") return <><MusicWidget /><Analysis onDone={async () => { await refresh(); setScreen("whatsnew"); }} /></>;
+  if (screen === "whatsnew") return <WhatsNew onNext={() => { markWhatsNewSeen(); setScreen("home"); }} />;
   if (screen === "workout" && wk) return <><MusicWidget /><Workout day={wk.day} dayIndex={wk.index} exercises={exercises} onExit={async () => { await refresh(); setScreen("home"); }} /></>;
   if (screen === "coach") return <><MusicWidget /><Coach onBack={() => setScreen("home")} onProgramChanged={refresh} /></>;
   if (!program || !today) return <Loading />;
@@ -66,7 +96,10 @@ export default function App() {
     {screen === "home" && <Home user={user} today={today} program={program} onStart={startWorkout} onShort={startShort} go={go} />}
     {screen === "schedule" && <Schedule program={program} todayIndex={today.day_index} onStart={startWorkout} onBack={() => setScreen("home")} />}
     {screen === "progress" && <Progress />}
-    {screen === "profile" && <Profile user={user} setUser={setUser} onRedo={() => { clearSession(); setScreen("onboarding"); }} onLogout={() => location.reload()} navOrder={navOrder} onNavChange={setNavOrderState} />}
+    {screen === "friends" && <Friends user={user} />}
+    {screen === "mind" && <Mind />}
+    {screen === "achievements" && <Achievements />}
+    {screen === "profile" && <Profile user={user} setUser={setUser} onRedo={() => { clearSession(); setScreen("onboarding"); }} onLogout={() => location.reload()} navOrder={navOrder} onNavChange={setNavOrderState} go={go} />}
     <Nav tab={tab} go={go} items={navItems} />
     {showTour && <Tour onClose={() => setShowTour(false)} />}
   </>);

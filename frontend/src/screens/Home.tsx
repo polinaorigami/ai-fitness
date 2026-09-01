@@ -9,6 +9,11 @@ export default function Home({ user, today, program, onStart, onShort, go }: { u
         <div><div className="eyebrow">AI FITNESS</div><h1 className="display" style={{ fontSize: 26 }}>{greet()}, {user.first_name} 👋</h1></div>
         {user.photo_url && <img src={user.photo_url} style={{ width: 44, height: 44, borderRadius: 14 }} />}
       </div>
+      <div className="grid3" style={{ marginBottom: 14, gap: 10 }}>
+        <Card><div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Энергия</div><div style={{ fontSize: 20, fontWeight: 600 }}>⚡ хорошо</div></Card>
+        <Card><div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Сон</div><div style={{ fontSize: 20, fontWeight: 600 }}>😴 6.5ч</div></Card>
+        <Card><div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Восстановление</div><div style={{ fontSize: 20, fontWeight: 600 }}>💪 90%</div></Card>
+      </div>
       {d.rest ? (
         <Card accent><div className="eyebrow">Сегодня</div><div className="big" style={{ margin: "10px 0" }}>ОТДЫХ</div>
           <div style={{ opacity: .85 }}>Восстановление — часть плана. {today.next && <>Следующая: {today.next.weekday.toLowerCase()}, {today.next.title.toLowerCase()}.</>}</div>
@@ -26,6 +31,25 @@ export default function Home({ user, today, program, onStart, onShort, go }: { u
           <Btn kind="ghost" onClick={onShort}>Короткая версия · 20 минут</Btn>
         </Card>
       )}
+      <div className="eyebrow" style={{ margin: "18px 0 10px" }}>Быстрые действия</div>
+      <div className="grid2" style={{ marginBottom: 20, gap: 10 }}>
+        <button style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "16px 12px", background: "var(--card)", border: "1px solid var(--line)", borderRadius: 16, cursor: "pointer" }}>
+          <div style={{ fontSize: 28 }}>🧘</div>
+          <div style={{ fontSize: 12, fontWeight: 500 }}>Растяжка</div>
+        </button>
+        <button style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "16px 12px", background: "var(--card)", border: "1px solid var(--line)", borderRadius: 16, cursor: "pointer" }}>
+          <div style={{ fontSize: 28 }}>🧘‍♀️</div>
+          <div style={{ fontSize: 12, fontWeight: 500 }}>Медитация</div>
+        </button>
+        <button style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "16px 12px", background: "var(--card)", border: "1px solid var(--line)", borderRadius: 16, cursor: "pointer" }}>
+          <div style={{ fontSize: 28 }}>🌬️</div>
+          <div style={{ fontSize: 12, fontWeight: 500 }}>Дыхание</div>
+        </button>
+        <button style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "16px 12px", background: "var(--card)", border: "1px solid var(--line)", borderRadius: 16, cursor: "pointer" }}>
+          <div style={{ fontSize: 28 }}>🎵</div>
+          <div style={{ fontSize: 12, fontWeight: 500 }}>Музыка</div>
+        </button>
+      </div>
       <div className="eyebrow" style={{ margin: "8px 0 10px" }}>Твой прогресс</div>
       <div className="grid2" style={{ marginBottom: 14 }}>
         <Stat v={<>🔥 {today.streak}</>} l="серия тренировок" />

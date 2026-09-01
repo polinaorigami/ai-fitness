@@ -2,17 +2,20 @@
 // Хранится локально на устройстве (localStorage).
 const NAV_KEY = "aifitness_nav_order";
 
-export type NavId = "home" | "workout" | "schedule" | "progress" | "profile";
+export type NavId = "home" | "workout" | "schedule" | "progress" | "friends" | "mind" | "achievements" | "profile";
 
 export const NAV_ITEMS: { id: NavId; label: string }[] = [
-  { id: "home", label: "Главная" },
-  { id: "workout", label: "Тренировка" },
+  { id: "home", label: "Сегодня" },
+  { id: "workout", label: "Тренировки" },
   { id: "schedule", label: "Расписание" },
   { id: "progress", label: "Прогресс" },
+  { id: "friends", label: "Вместе" },
+  { id: "mind", label: "Mind" },
+  { id: "achievements", label: "Достижения" },
   { id: "profile", label: "Профиль" },
 ];
 
-const DEFAULT_VISIBLE: NavId[] = ["home", "workout", "progress", "profile"];
+const DEFAULT_VISIBLE: NavId[] = ["home", "workout", "friends", "mind", "profile"];
 
 export function getNavOrder(): NavId[] {
   try {

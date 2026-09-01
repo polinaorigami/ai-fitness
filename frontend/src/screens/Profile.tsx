@@ -9,7 +9,7 @@ import { clearSession } from "./Workout";
 const CREATOR_LINK = "https://polinapeiv.taplink.ws";
 const G: Record<string, string> = { weight_loss: "Снижение веса", muscle: "Набор мышц", recomp: "Рекомпозиция тела", strength: "Стать сильнее", fitness: "Улучшить физическую форму", endurance: "Развить выносливость" };
 const L: Record<string, string> = { beginner: "Новичок", intermediate: "Средний", advanced: "Продвинутый" };
-export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onNavChange }: { user: User; setUser: (u: User) => void; onRedo: () => void; onLogout: () => void; navOrder: NavId[]; onNavChange: (ids: NavId[]) => void }) {
+export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onNavChange, go }: { user: User; setUser: (u: User) => void; onRedo: () => void; onLogout: () => void; navOrder: NavId[]; onNavChange: (ids: NavId[]) => void; go?: (t: string) => void }) {
   const [busy, setBusy] = useState(""); const eqLabel = (k: string) => EQUIP.find(e => e[0] === k)?.[1] || k;
   const zoneLabel = (k?: string) => ZONES.find(z => z[0] === k)?.[2] || "Без акцента";
   const [theme, setThemeState] = useState(getTheme());
@@ -114,6 +114,16 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
         {showCoachInfo && <div style={{ marginTop: 12, fontSize: 14, color: "var(--muted)", lineHeight: 1.5 }}>
           Программа собирается на основе твоей анкеты: цели, уровня, дней в неделю и оборудования. После тренировок AI-тренер подстраивает веса и нагрузку по твоей обратной связи (RPE, «было легко/тяжело»), а в чате отвечает на вопросы про перенос тренировки, боль, усталость и корректировку плана. Диагнозов не ставит и не заменяет врача или диетолога.
         </div>}
+      </Card>
+      <div className="row between" style={{ alignItems: "center", marginBottom: 16 }}>
+        <div className="eyebrow" style={{ margin: 0 }}>Достижения</div>
+        {go && <button className="btn ghost sm" onClick={() => go("achievements")}>Смотреть все →</button>}
+      </div>
+      <Card style={{ textAlign: "center", padding: 24 }}>
+        <div style={{ fontSize: 28, marginBottom: 8 }}>🏅</div>
+        <div style={{ fontWeight: 500, marginBottom: 4 }}>Твои медали</div>
+        <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12 }}>Достигай целей и разблокируй новые достижения</div>
+        {go && <Btn kind="accent" onClick={() => go("achievements")} style={{ width: "100%" }}>Открыть достижения</Btn>}
       </Card>
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Уведомления</div>
       <Card><div className="toggle"><span>Время тренировки</span><input type="time" value={user.workout_time} onChange={e => time(e.target.value)} style={{ width: 120, padding: "8px 12px", fontSize: 16 }} /></div>

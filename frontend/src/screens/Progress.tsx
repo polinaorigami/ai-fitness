@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Btn, Card, Stat, Loading, Err } from "../components/UI";
+import { Btn, Card, Stat, Loading, Err, CardSkeleton, StatSkeleton } from "../components/UI";
 import { api, Progress as P, PhotoT } from "../api";
 
 export default function Progress() {
