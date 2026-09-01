@@ -18,6 +18,7 @@ export const api = {
   reschedule: () => req<{ week: Day[] }>("POST", "/api/program/reschedule"),
   adjust: (d: "up" | "down") => req<{ week: Day[] }>("POST", `/api/program/adjust?direction=${d}`),
   short: () => req<{ day_index: number; day: Day }>("POST", "/api/program/short"),
+  duration: (minutes: number) => req<{ day_index: number; day: Day }>("POST", `/api/program/duration?minutes=${minutes}`),
   sessionStart: (day_index: number) => req<{ session_id: number }>("POST", "/api/session/start", { day_index }),
   sessionFinish: (id: number, b: any) => req<Finish>("POST", `/api/session/${id}/finish`, b),
   feedback: (id: number, b: any) => req<{ message: string }>("POST", `/api/session/${id}/feedback`, b),
@@ -33,6 +34,15 @@ export const api = {
   coachHistory: () => req<Msg[]>("GET", "/api/coach"),
   coach: (text: string) => req<Msg>("POST", "/api/coach", { text }),
   appFeedback: (b: { liked?: boolean | null; comment?: string }) => req<{ ok: boolean }>("POST", "/api/feedback", b),
+  // друзья
+  friends: () => req<FriendsData>("GET", "/api/friends"),
+  friendInvite: (code: string) => req<{ status: string; to?: FriendBrief; friend?: FriendBrief }>("POST", "/api/friends/invite", { code }),
+  friendInvites: () => req<{ incoming: FriendInviteT[]; outgoing: FriendInviteT[] }>("GET", "/api/friends/invites"),
+  friendAccept: (id: number) => req<{ status: string; friend: FriendBrief | null }>("POST", `/api/friends/invite/${id}/accept`),
+  friendDecline: (id: number) => req<{ ok: boolean }>("POST", `/api/friends/invite/${id}/decline`),
+  friendRemove: (fid: number) => req<{ ok: boolean }>("DELETE", `/api/friends/${fid}`),
+  friendMessages: (fid: number, after = 0) => req<FriendMsg[]>("GET", `/api/friends/${fid}/messages?after=${after}`),
+  friendSend: (fid: number, text: string) => req<FriendMsg>("POST", `/api/friends/${fid}/messages`, { text }),
 };
 export type User = { id: number; first_name: string; username?: string; photo_url?: string; goal?: string; days_per_week?: number; location?: string; minutes?: number; level?: string; age?: number; height_cm?: number; weight_kg?: number; sex?: string; equipment: string[]; onboarded: boolean; remind_workout: boolean; remind_rest: boolean; weekly_report: boolean; remind_progress: boolean; workout_time: string; timezone_offset: number; taplink_url?: string; focus_zone?: string };
 export type Exercise = { id: string; name: string; group: string; group_label: string; equipment_labels: string[]; level_label: string; description: string; technique: string; mistakes: string; youtube_url: string | null };
@@ -44,3 +54,7 @@ export type Finish = { duration_sec: number; exercises: number; sets_done: numbe
 export type Progress = { streak: number; workouts: number; total_minutes: number; lifts: { exercise_id: string; name: string; first: number; last: number; history: { date: string; weight: number; reps: number }[] }[]; weekly: { week: number; count: number }[]; recent: { id: number; title: string; date: string; minutes: number; rpe: number | null }[]; measurements: Record<string, any>[] };
 export type PhotoT = { id: number; label: string; kind: string; created_at: string };
 export type Msg = { role: "user" | "ai"; text: string; actions: string[] };
+export type FriendBrief = { id: number; first_name: string; username?: string | null; photo_url?: string | null };
+export type FriendsData = { code: string; friends: (FriendBrief & { unread: number })[]; incoming: number };
+export type FriendInviteT = { invite_id: number; user: FriendBrief };
+export type FriendMsg = { id: number; from_me: boolean; text: string; at: string };

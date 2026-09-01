@@ -31,6 +31,7 @@ class User(Base):
     timezone_offset: Mapped[int] = mapped_column(Integer, default=180)  # минуты от UTC
     taplink_url: Mapped[str | None] = mapped_column(String(256))
     focus_zone: Mapped[str | None] = mapped_column(String(16))  # акцентная зона: glutes/abs/arms/back/chest/legs/full
+    friend_code: Mapped[str | None] = mapped_column(String(12), unique=True, index=True)  # код для добавления в друзья
 
 class Program(Base):
     __tablename__ = "programs"
@@ -107,4 +108,32 @@ class ChatMessage(Base):
     role: Mapped[str] = mapped_column(String(8))
     text: Mapped[str] = mapped_column(Text)
     actions: Mapped[list] = mapped_column(JSON, default=list)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+class Friendship(Base):
+    """Принятая дружба. Хранится по одной строке на КАЖДОЕ направление
+    (A→B и B→A), чтобы список «мои друзья» получался одним простым запросом."""
+    __tablename__ = "friendships"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    owner_id: Mapped[int] = mapped_column(BigInteger, index=True)
+    friend_id: Mapped[int] = mapped_column(BigInteger, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+class FriendInvite(Base):
+    """Приглашение в друзья: from_id пригласил to_id. status: pending/accepted/declined."""
+    __tablename__ = "friend_invites"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    from_id: Mapped[int] = mapped_column(BigInteger, index=True)
+    to_id: Mapped[int] = mapped_column(BigInteger, index=True)
+    status: Mapped[str] = mapped_column(String(10), default="pending")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+class FriendMessage(Base):
+    """Сообщение в личном чате между двумя друзьями."""
+    __tablename__ = "friend_messages"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    from_id: Mapped[int] = mapped_column(BigInteger, index=True)
+    to_id: Mapped[int] = mapped_column(BigInteger, index=True)
+    text: Mapped[str] = mapped_column(Text)
+    read: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

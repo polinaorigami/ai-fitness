@@ -17,6 +17,14 @@ const ICONS: Record<string, ReactNode> = {
   achievements: <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4" /><path d="M8.56 2.75c-.3-.3-.7-.46-1.15-.46-1.41 0-2.41 1-2.41 2.41 0 .45.15.85.46 1.15" /><path d="M15.44 2.75c.3-.3.7-.46 1.15-.46 1.41 0 2.41 1 2.41 2.41 0 .45-.15.85-.46 1.15" /><path d="M12 12v8M10 20h4" /></svg>,
   profile: <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4" /><path d="M4 20c1.6-4 5-6 8-6s6.4 2 8 6" /></svg>,
 };
+// Единый набор линейных иконок 26×26 (stroke 1.8, currentColor) для действий и разделов.
+const ACTION_ICONS: Record<string, ReactNode> = {
+  stretch: <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="4.5" r="2" /><path d="M12 6.5v6M12 12.5l-4 5M12 12.5l4 5M7 9l5 1.5L17 9" /></svg>,
+  meditation: <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="5" r="2" /><path d="M5 19c1.5-4 4-6 7-6s5.5 2 7 6M4 15l4 2M20 15l-4 2" /></svg>,
+  breathing: <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="8" opacity=".35" /><circle cx="12" cy="12" r="4" /></svg>,
+  music: <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V6l10-2v12" /><circle cx="6" cy="18" r="2.5" /><circle cx="16" cy="16" r="2.5" /></svg>,
+};
+export const ActionIcon = ({ name }: { name: string }) => <>{ACTION_ICONS[name] || null}</>;
 export const Nav = ({ tab, go, items }: { tab: string; go: (t: string) => void; items: { id: string; label: string }[] }) => (
   <nav className="nav">{items.map(({ id, label }) => (
     <button key={id} className={tab === id ? "on" : ""} onClick={() => { haptic(); go(id); }}>{ICONS[id]}{label}</button>
@@ -31,8 +39,8 @@ export const Stepper = ({ value, step, min = 0, onChange, unit }: { value: numbe
 );
 export const Loading = ({ text }: { text?: string }) => (
   <div className="splash">
-    <div className="logo">AI <b>FITNESS</b></div>
-    <div className="tag">{text || "Движение · Восстановление · Развитие"}</div>
+    <div className="logo">AI FITNESS</div>
+    {text && <div className="tag">{text}</div>}
     <div className="load"><i /></div>
   </div>
 );

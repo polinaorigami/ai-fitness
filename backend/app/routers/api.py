@@ -5,7 +5,8 @@ from fastapi.responses import FileResponse
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from ..db import get_db
-from ..models import User, Program, WorkoutSession, SetLog, Measurement, Photo, ChatMessage, AppFeedback
+import secrets
+from ..models import User, Program, WorkoutSession, SetLog, Measurement, Photo, ChatMessage, AppFeedback, Friendship, FriendInvite, FriendMessage
 from ..telegram_auth import current_user
 from ..schemas import *
 from ..exercises import EXERCISES, BY_ID
@@ -116,6 +117,28 @@ def short_version(user: User = Depends(current_user), db: Session = Depends(get_
     exs = [dict(x, sets=2, rest_sec=min(x["rest_sec"], 45)) for x in d["exercises"][:4]]
     return {"day_index": wd, "day": dict(d, title=d["title"] + " · 20 минут", exercises=exs)}
 
+@r.post("/program/duration")
+def duration_version(minutes: int, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Собрать тренировку под доступное время (5–60 мин): подгоняем число упражнений,
+    подходов и длину отдыха так, чтобы уложиться примерно в заданную длительность.
+    Если сегодня день отдыха — берём ближайший тренировочный день."""
+    minutes = max(5, min(60, minutes))
+    p = _program(db, user.id)
+    if not p: raise HTTPException(404, "Программа ещё не создана")
+    wd = (datetime.utcnow() + timedelta(minutes=user.timezone_offset)).weekday()
+    idx = wd
+    if p.week[wd]["rest"]:
+        idx = next((j % 7 for j in range(wd + 1, wd + 8) if not p.week[j % 7]["rest"]), -1)
+        if idx < 0: raise HTTPException(400, "В программе нет тренировочных дней")
+    d = p.week[idx]
+    # параметры под время
+    sets = 2 if minutes <= 20 else 3
+    rest = 30 if minutes <= 10 else 45 if minutes <= 25 else 60
+    per = sets * 0.75 + sets * rest / 60  # ≈ минут на упражнение
+    n = max(1, min(len(d["exercises"]), round((minutes - 5) / per)))
+    exs = [dict(x, sets=sets, rest_sec=min(x["rest_sec"], rest)) for x in d["exercises"][:n]]
+    return {"day_index": idx, "day": dict(d, title=f"{d['title']} · {minutes} мин", exercises=exs)}
+
 # ---- тренировка ----
 @r.post("/session/start")
 def session_start(body: SessionStart, user: User = Depends(current_user), db: Session = Depends(get_db)):
@@ -222,6 +245,10 @@ def delete_history(user: User = Depends(current_user), db: Session = Depends(get
 def delete_account(user: User = Depends(current_user), db: Session = Depends(get_db)):
     delete_photos(user, db); delete_history(user, db)
     for p in db.scalars(select(Program).where(Program.user_id==user.id)): db.delete(p)
+    # чистим друзей, приглашения и переписку в обе стороны
+    for row in db.scalars(select(Friendship).where((Friendship.owner_id==user.id) | (Friendship.friend_id==user.id))): db.delete(row)
+    for row in db.scalars(select(FriendInvite).where((FriendInvite.from_id==user.id) | (FriendInvite.to_id==user.id))): db.delete(row)
+    for row in db.scalars(select(FriendMessage).where((FriendMessage.from_id==user.id) | (FriendMessage.to_id==user.id))): db.delete(row)
     db.delete(user); db.commit(); return {"ok": True}
 
 # ---- обратная связь по приложению ----
@@ -257,3 +284,135 @@ async def coach(body: ChatIn, user: User = Depends(current_user), db: Session = 
     db.add(ChatMessage(user_id=user.id, role="ai", text=reply["text"], actions=reply.get("actions", [])))
     db.commit()
     return reply
+
+# ---- друзья ----
+_CODE_ALPHABET = "ACEFHJKLMNPRTUVWXY3479"  # без похожих символов (0/O, 1/I, и т.п.)
+
+def _ensure_code(db, user: User) -> str:
+    """Гарантирует, что у пользователя есть уникальный код приглашения."""
+    if user.friend_code:
+        return user.friend_code
+    for _ in range(20):
+        code = "".join(secrets.choice(_CODE_ALPHABET) for _ in range(6))
+        if not db.scalar(select(User).where(User.friend_code == code)):
+            user.friend_code = code
+            db.commit()
+            return code
+    raise HTTPException(500, "Не удалось сгенерировать код")
+
+def _brief(u: User):
+    return {"id": u.id, "first_name": u.first_name, "username": u.username, "photo_url": u.photo_url}
+
+def _are_friends(db, a: int, b: int) -> bool:
+    return bool(db.scalar(select(Friendship).where(Friendship.owner_id == a, Friendship.friend_id == b)))
+
+@r.get("/friends")
+def friends_list(user: User = Depends(current_user), db: Session = Depends(get_db)):
+    code = _ensure_code(db, user)
+    fids = [f.friend_id for f in db.scalars(select(Friendship).where(Friendship.owner_id == user.id).order_by(Friendship.created_at.desc()))]
+    friends = [_brief(u) for u in db.scalars(select(User).where(User.id.in_(fids)))] if fids else []
+    # сохраняем порядок по дате дружбы
+    order = {fid: i for i, fid in enumerate(fids)}
+    friends.sort(key=lambda f: order.get(f["id"], 0))
+    incoming = db.scalar(select(func.count(FriendInvite.id)).where(FriendInvite.to_id == user.id, FriendInvite.status == "pending")) or 0
+    # непрочитанные сообщения по каждому другу
+    unread = {}
+    for m in db.scalars(select(FriendMessage).where(FriendMessage.to_id == user.id, FriendMessage.read == False)):
+        unread[m.from_id] = unread.get(m.from_id, 0) + 1
+    for f in friends:
+        f["unread"] = unread.get(f["id"], 0)
+    return {"code": f"AI-{code}", "friends": friends, "incoming": incoming}
+
+@r.post("/friends/invite")
+def friend_invite(body: FriendInviteIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    raw = body.code.strip().upper().removeprefix("AI-").replace("-", "")
+    if not raw:
+        raise HTTPException(400, "Введите код")
+    target = db.scalar(select(User).where(User.friend_code == raw))
+    if not target:
+        raise HTTPException(404, "Пользователь с таким кодом не найден")
+    if target.id == user.id:
+        raise HTTPException(400, "Это твой собственный код")
+    if _are_friends(db, user.id, target.id):
+        raise HTTPException(400, "Вы уже друзья")
+    # уже есть приглашение от меня к ним?
+    mine = db.scalar(select(FriendInvite).where(FriendInvite.from_id == user.id, FriendInvite.to_id == target.id, FriendInvite.status == "pending"))
+    if mine:
+        return {"status": "already_sent"}
+    # встречное приглашение от них ко мне — сразу дружим
+    theirs = db.scalar(select(FriendInvite).where(FriendInvite.from_id == target.id, FriendInvite.to_id == user.id, FriendInvite.status == "pending"))
+    if theirs:
+        theirs.status = "accepted"
+        db.add_all([Friendship(owner_id=user.id, friend_id=target.id), Friendship(owner_id=target.id, friend_id=user.id)])
+        db.commit()
+        return {"status": "friends", "friend": _brief(target)}
+    db.add(FriendInvite(from_id=user.id, to_id=target.id))
+    db.commit()
+    return {"status": "sent", "to": _brief(target)}
+
+@r.get("/friends/invites")
+def friend_invites(user: User = Depends(current_user), db: Session = Depends(get_db)):
+    inc = list(db.scalars(select(FriendInvite).where(FriendInvite.to_id == user.id, FriendInvite.status == "pending").order_by(FriendInvite.id.desc())))
+    out = list(db.scalars(select(FriendInvite).where(FriendInvite.from_id == user.id, FriendInvite.status == "pending").order_by(FriendInvite.id.desc())))
+    ids = {i.from_id for i in inc} | {i.to_id for i in out}
+    users = {u.id: u for u in db.scalars(select(User).where(User.id.in_(ids)))} if ids else {}
+    return {
+        "incoming": [{"invite_id": i.id, "user": _brief(users[i.from_id])} for i in inc if i.from_id in users],
+        "outgoing": [{"invite_id": i.id, "user": _brief(users[i.to_id])} for i in out if i.to_id in users],
+    }
+
+@r.post("/friends/invite/{invite_id}/accept")
+def friend_accept(invite_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    inv = db.get(FriendInvite, invite_id)
+    if not inv or inv.to_id != user.id or inv.status != "pending":
+        raise HTTPException(404, "Приглашение не найдено")
+    inv.status = "accepted"
+    if not _are_friends(db, user.id, inv.from_id):
+        db.add_all([Friendship(owner_id=user.id, friend_id=inv.from_id), Friendship(owner_id=inv.from_id, friend_id=user.id)])
+    db.commit()
+    friend = db.get(User, inv.from_id)
+    return {"status": "friends", "friend": _brief(friend) if friend else None}
+
+@r.post("/friends/invite/{invite_id}/decline")
+def friend_decline(invite_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    inv = db.get(FriendInvite, invite_id)
+    if not inv or inv.to_id != user.id or inv.status != "pending":
+        raise HTTPException(404, "Приглашение не найдено")
+    inv.status = "declined"
+    db.commit()
+    return {"ok": True}
+
+@r.delete("/friends/{fid}")
+def friend_remove(fid: int, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    for row in db.scalars(select(Friendship).where(
+        ((Friendship.owner_id == user.id) & (Friendship.friend_id == fid)) |
+        ((Friendship.owner_id == fid) & (Friendship.friend_id == user.id)))):
+        db.delete(row)
+    db.commit()
+    return {"ok": True}
+
+@r.get("/friends/{fid}/messages")
+def friend_messages(fid: int, after: int = 0, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    if not _are_friends(db, user.id, fid):
+        raise HTTPException(403, "Вы не друзья")
+    q = select(FriendMessage).where(
+        (((FriendMessage.from_id == user.id) & (FriendMessage.to_id == fid)) |
+         ((FriendMessage.from_id == fid) & (FriendMessage.to_id == user.id))) &
+        (FriendMessage.id > after)).order_by(FriendMessage.id)
+    msgs = list(db.scalars(q))
+    # помечаем входящие как прочитанные
+    changed = False
+    for m in msgs:
+        if m.to_id == user.id and not m.read:
+            m.read = True; changed = True
+    if changed:
+        db.commit()
+    return [{"id": m.id, "from_me": m.from_id == user.id, "text": m.text, "at": m.created_at.isoformat()} for m in msgs]
+
+@r.post("/friends/{fid}/messages")
+def friend_send(fid: int, body: FriendMessageIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    if not _are_friends(db, user.id, fid):
+        raise HTTPException(403, "Вы не друзья")
+    m = FriendMessage(from_id=user.id, to_id=fid, text=body.text.strip())
+    db.add(m); db.commit()
+    return {"id": m.id, "from_me": True, "text": m.text, "at": m.created_at.isoformat()}

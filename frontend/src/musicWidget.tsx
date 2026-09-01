@@ -89,8 +89,11 @@ const musicDB = new MusicDB();
 const TRACK_KEY = "aifitness_music_track";
 const POS_KEY = "aifitness_music_pos";
 const TIME_KEY = "aifitness_music_time";
+const ON_KEY = "aifitness_music_on";
 const SIZE = 44;
 
+const loadOn = () => { try { return localStorage.getItem(ON_KEY) === "1"; } catch { return false; } };
+const saveOn = (v: boolean) => { try { localStorage.setItem(ON_KEY, v ? "1" : "0"); } catch {} };
 const loadTrackIdx = () => { try { const v = +(localStorage.getItem(TRACK_KEY) || 0); return v; } catch { return 0; } };
 const loadPos = (): { x: number; y: number } | null => { try { const raw = localStorage.getItem(POS_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; } };
 const savePos = (p: { x: number; y: number }) => { try { localStorage.setItem(POS_KEY, JSON.stringify(p)); } catch {} };
@@ -108,7 +111,7 @@ const fmtTime = (s: number) => {
 };
 
 export default function MusicWidget() {
-  const [on, setOn] = useState(false);
+  const [on, setOn] = useState(loadOn());
   const [expanded, setExpanded] = useState(false);
   const [allTracks, setAllTracks] = useState<Track[]>(BUILTIN_TRACKS);
   const [trackIdx, setTrackIdx] = useState(loadTrackIdx());
@@ -116,6 +119,7 @@ export default function MusicWidget() {
   const [dragging, setDragging] = useState(false);
   const [currentTime, setCurrentTime] = useState(loadTime());
   const [uploading, setUploading] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const synthRef = useRef<{ ctx: AudioContext; nodes: (OscillatorNode | GainNode)[] } | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const dragInfo = useRef<{ startX: number; startY: number; origX: number; origY: number; moved: boolean } | null>(null);
@@ -136,14 +140,21 @@ export default function MusicWidget() {
     })();
   }, []);
 
-  // Восстановление позиции проигрывания
+  // Возобновление воспроизведения при повторном монтировании виджета
+  // (например, при переходе между экранами) — с той же позиции и трека.
+  const resumedOnce = useRef(false);
   useEffect(() => {
+    if (resumedOnce.current || !on) return;
     const track = allTracks[trackIdx];
-    if (audioRef.current && track?.src && on) {
+    if (!track) return;
+    resumedOnce.current = true;
+    if (track.id === "ambient") { startSynth(); return; }
+    if (audioRef.current && track.src) {
+      audioRef.current.src = track.src;
       audioRef.current.currentTime = currentTime;
       audioRef.current.play().catch(() => {});
     }
-  }, [on]);
+  }, [allTracks]);
 
   // Сохранение текущей позиции при окончании трека
   useEffect(() => {
@@ -156,9 +167,11 @@ export default function MusicWidget() {
     };
 
     const onEnded = () => {
-      switchTrack(1);
-      setCurrentTime(0);
-      saveTime(0);
+      // авто-переход на следующий трек (с начала)
+      const idx = (trackIdx + 1) % allTracks.length;
+      setTrackIdx(idx);
+      try { localStorage.setItem(TRACK_KEY, String(idx)); } catch {}
+      startTrack(idx);
     };
 
     audio.addEventListener("timeupdate", updateTime);
@@ -197,10 +210,14 @@ export default function MusicWidget() {
     synthRef.current = null;
   };
 
-  const playIdx = (idx: number) => {
+  // Запустить НОВЫЙ трек с начала (переключение трека).
+  const startTrack = (idx: number) => {
     stopSynth();
     audioRef.current?.pause();
     const t = allTracks[idx];
+    if (!t) return;
+    setCurrentTime(0);
+    saveTime(0);
     if (t.id === "ambient") {
       startSynth();
       return;
@@ -208,21 +225,36 @@ export default function MusicWidget() {
     if (audioRef.current && t.src) {
       audioRef.current.src = t.src;
       audioRef.current.currentTime = 0;
-      setCurrentTime(0);
       audioRef.current.play().catch(() => {});
+    }
+  };
+
+  // Продолжить ТЕКУЩИЙ трек с сохранённой позиции (после паузы).
+  const resumeCurrent = () => {
+    const t = allTracks[trackIdx];
+    if (!t) return;
+    if (t.id === "ambient") { startSynth(); return; }
+    const audio = audioRef.current;
+    if (audio && t.src) {
+      // src ставим только если ещё не тот трек — иначе позиция сохраняется
+      if (!audio.src || !audio.src.includes(t.src)) audio.src = t.src;
+      audio.currentTime = currentTime;
+      audio.play().catch(() => {});
     }
   };
 
   const stopAll = () => {
     stopSynth();
-    audioRef.current?.pause();
+    audioRef.current?.pause(); // pause сохраняет currentTime
   };
+
+  const setPlaying = (v: boolean) => { setOn(v); saveOn(v); };
 
   const togglePlay = () => {
     haptic();
     const next = !on;
-    setOn(next);
-    if (next) playIdx(trackIdx);
+    setPlaying(next);
+    if (next) resumeCurrent();
     else stopAll();
   };
 
@@ -239,9 +271,8 @@ export default function MusicWidget() {
     try {
       localStorage.setItem(TRACK_KEY, String(idx));
     } catch {}
-    setCurrentTime(0);
-    saveTime(0);
-    if (on) playIdx(idx);
+    if (on) startTrack(idx);
+    else { setCurrentTime(0); saveTime(0); }
   };
 
   const pickTrack = (idx: number) => {
@@ -254,10 +285,19 @@ export default function MusicWidget() {
     try {
       localStorage.setItem(TRACK_KEY, String(idx));
     } catch {}
-    setCurrentTime(0);
-    saveTime(0);
-    setOn(true);
-    playIdx(idx);
+    setPlaying(true);
+    startTrack(idx);
+  };
+
+  // Перемотка по клику/тапу на прогресс-баре.
+  const seekTo = (fraction: number) => {
+    const t = allTracks[trackIdx];
+    const audio = audioRef.current;
+    if (!t?.duration || !audio || t.id === "ambient") return;
+    const time = Math.max(0, Math.min(t.duration, fraction * t.duration));
+    audio.currentTime = time;
+    setCurrentTime(time);
+    saveTime(time);
   };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -285,7 +325,6 @@ export default function MusicWidget() {
       }
     } catch (err) {
       console.error("Upload failed:", err);
-      alert("Ошибка при загрузке трека");
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -293,7 +332,7 @@ export default function MusicWidget() {
   };
 
   const deleteCustomTrack = async (id: string) => {
-    if (!confirm("Удалить трек?")) return;
+    setConfirmDelete(null);
     try {
       await musicDB.deleteTrack(id);
       setAllTracks(prev => prev.filter(t => t.id !== id));
@@ -302,11 +341,16 @@ export default function MusicWidget() {
       }
     } catch (err) {
       console.error("Delete failed:", err);
-      alert("Ошибка при удалении трека");
     }
   };
 
   useEffect(() => () => stopAll(), []);
+  // Открытие панели плеера из «Быстрых действий» на главной.
+  useEffect(() => {
+    const openMusic = () => setExpanded(true);
+    window.addEventListener("aifitness:open-music", openMusic);
+    return () => window.removeEventListener("aifitness:open-music", openMusic);
+  }, []);
   useEffect(() => {
     const onResize = () => setPos(p => clamp(p));
     window.addEventListener("resize", onResize);
@@ -455,15 +499,32 @@ export default function MusicWidget() {
           </div>
 
           {/* Инфо о треке */}
-          <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 6, textAlign: "center", color: "var(--muted)" }}>
+          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, textAlign: "center", color: "var(--ink)" }}>
             {track?.title}
-            {track?.duration && (
-              <>
-                <br />
-                {fmtTime(currentTime)} / {fmtTime(track.duration)}
-              </>
-            )}
           </div>
+
+          {/* Прогресс-бар с перемоткой (только для треков с длительностью) */}
+          {track?.duration ? (
+            <div style={{ marginBottom: 8 }}>
+              <div
+                onClick={(e) => {
+                  const r = e.currentTarget.getBoundingClientRect();
+                  seekTo((e.clientX - r.left) / r.width);
+                }}
+                style={{ height: 4, background: "var(--line)", borderRadius: 99, cursor: "pointer", position: "relative", overflow: "hidden" }}
+              >
+                <div style={{ height: "100%", width: `${Math.min(100, (currentTime / track.duration) * 100)}%`, background: "var(--accent)", borderRadius: 99, transition: "width .2s linear" }} />
+              </div>
+              <div className="row between" style={{ marginTop: 4, fontSize: 10, color: "var(--muted)", fontVariantNumeric: "tabular-nums" }}>
+                <span>{fmtTime(currentTime)}</span>
+                <span>{fmtTime(track.duration)}</span>
+              </div>
+            </div>
+          ) : (
+            <div style={{ fontSize: 10, color: "var(--muted)", textAlign: "center", marginBottom: 8 }}>
+              {track?.id === "ambient" ? "Эмбиент · бесконечно" : ""}
+            </div>
+          )}
 
           {/* Список треков */}
           <div style={{ maxHeight: 160, overflowY: "auto", marginBottom: 8 }}>
@@ -495,19 +556,32 @@ export default function MusicWidget() {
                   {i === trackIdx && on ? "▶" : "♪"} {t.title}
                 </button>
                 {t.custom && (
-                  <button
-                    onClick={() => deleteCustomTrack(t.id)}
-                    style={{
-                      border: "none",
-                      background: "transparent",
-                      color: "var(--muted)",
-                      cursor: "pointer",
-                      fontSize: 12,
-                      padding: "4px 4px",
-                    }}
-                  >
-                    ✕
-                  </button>
+                  confirmDelete === t.id ? (
+                    <>
+                      <button
+                        onClick={() => deleteCustomTrack(t.id)}
+                        aria-label="Подтвердить удаление"
+                        style={{ border: "none", background: "var(--danger-bg)", color: "var(--danger-ink)", cursor: "pointer", fontSize: 11, fontWeight: 600, padding: "4px 8px", borderRadius: 8 }}
+                      >
+                        Удалить
+                      </button>
+                      <button
+                        onClick={() => setConfirmDelete(null)}
+                        aria-label="Отмена"
+                        style={{ border: "none", background: "transparent", color: "var(--muted)", cursor: "pointer", fontSize: 14, padding: "4px 4px" }}
+                      >
+                        ↩
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => setConfirmDelete(t.id)}
+                      aria-label="Удалить трек"
+                      style={{ border: "none", background: "transparent", color: "var(--muted)", cursor: "pointer", fontSize: 12, padding: "4px 4px" }}
+                    >
+                      ✕
+                    </button>
+                  )
                 )}
               </div>
             ))}

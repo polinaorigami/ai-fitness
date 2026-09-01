@@ -22,6 +22,17 @@ BIGINT_COLUMNS = [
     ("photos", "user_id"),
     ("app_feedback", "user_id"),
     ("chat", "user_id"),
+    ("friendships", "owner_id"),
+    ("friendships", "friend_id"),
+    ("friend_invites", "from_id"),
+    ("friend_invites", "to_id"),
+    ("friend_messages", "from_id"),
+    ("friend_messages", "to_id"),
+]
+
+# (таблица, колонка, SQL-тип) -> добавить, если отсутствует
+ADD_COLUMNS = [
+    ("users", "friend_code", "VARCHAR(12)"),
 ]
 
 
@@ -45,3 +56,9 @@ def run_migrations() -> None:
                 f'ALTER TABLE "{table}" ALTER COLUMN "{column}" TYPE BIGINT'
             ))
             log.warning("migrate: %s.%s %s -> bigint", table, column, dtype)
+        # добавляем недостающие колонки в существующие таблицы
+        tables = {t for (t, _c) in existing}
+        for table, column, sqltype in ADD_COLUMNS:
+            if table in tables and (table, column) not in existing:
+                conn.execute(text(f'ALTER TABLE "{table}" ADD COLUMN "{column}" {sqltype}'))
+                log.warning("migrate: added %s.%s %s", table, column, sqltype)

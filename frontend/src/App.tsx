@@ -71,6 +71,7 @@ export default function App() {
 
   const startWorkout = (index: number) => { if (!program) return; setWk({ day: program.week[index], index }); setScreen("workout"); };
   const startShort = async () => { try { const r = await api.short(); setWk({ day: r.day, index: r.day_index }); setScreen("workout"); } catch (e: any) { alert(e.message || "Не удалось собрать короткую версию"); } };
+  const startDuration = async (minutes: number) => { const r = await api.duration(minutes); setWk({ day: r.day, index: r.day_index }); setScreen("workout"); };
   const go = (t: string) => {
     if (t === "workout") { if (today && !today.day.rest) startWorkout(today.day_index); else setScreen("schedule"); }
     else setScreen(t as Screen);
@@ -93,7 +94,7 @@ export default function App() {
   if (!program || !today) return <Loading />;
   return (<>
     <MusicWidget />
-    {screen === "home" && <Home user={user} today={today} program={program} onStart={startWorkout} onShort={startShort} go={go} />}
+    {screen === "home" && <Home user={user} today={today} program={program} onStart={startWorkout} onShort={startShort} onDuration={startDuration} go={go} />}
     {screen === "schedule" && <Schedule program={program} todayIndex={today.day_index} onStart={startWorkout} onBack={() => setScreen("home")} />}
     {screen === "progress" && <Progress />}
     {screen === "friends" && <Friends user={user} />}

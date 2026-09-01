@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Btn, Card } from "../components/UI";
 import { api, User } from "../api";
-import { EQUIP, ZONES } from "./Onboarding";
+import { EQUIP } from "./Onboarding";
+import { BodyMap, ZoneKey, ZONE_LABELS } from "../components/BodyMap";
 import { THEME_PRESETS, getTheme, setTheme } from "../theme";
 import { openLink, getMode, setMode, ThemeMode } from "../tg";
 import { NAV_ITEMS, NavId, setNavOrder as saveNavOrder } from "../navPrefs";
@@ -11,7 +12,7 @@ const G: Record<string, string> = { weight_loss: "Снижение веса", mu
 const L: Record<string, string> = { beginner: "Новичок", intermediate: "Средний", advanced: "Продвинутый" };
 export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onNavChange, go }: { user: User; setUser: (u: User) => void; onRedo: () => void; onLogout: () => void; navOrder: NavId[]; onNavChange: (ids: NavId[]) => void; go?: (t: string) => void }) {
   const [busy, setBusy] = useState(""); const eqLabel = (k: string) => EQUIP.find(e => e[0] === k)?.[1] || k;
-  const zoneLabel = (k?: string) => ZONES.find(z => z[0] === k)?.[2] || "Без акцента";
+  const zoneLabel = (k?: string) => ZONE_LABELS.find(z => z[0] === k)?.[1] || "Без акцента";
   const [theme, setThemeState] = useState(getTheme());
   const [mode, setModeState] = useState<ThemeMode>(getMode());
   const pickMode = (m: ThemeMode) => { setModeState(m); setMode(m); };
@@ -61,8 +62,15 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Профиль</div>
       <Card><Row l="Цель" v={G[user.goal!]} /><Row l="Акцент" v={zoneLabel(user.focus_zone)} /><Row l="Возраст" v={user.age} /><Row l="Рост" v={user.height_cm && `${user.height_cm} см`} /><Row l="Вес" v={user.weight_kg && `${user.weight_kg} кг`} /><Row l="Тренировок в неделю" v={user.days_per_week} /><Row l="Опыт" v={L[user.level!]} /><Row l="Оборудование" v={<span style={{ fontSize: 13 }}>{user.equipment.map(eqLabel).join(", ")}</span>} />
         <div style={{ height: 16 }} />
-        <div className="eyebrow" style={{ marginBottom: 8 }}>Быстро сменить акцент</div>
-        <div className="chips" style={{ marginBottom: 14 }}>{ZONES.map(([k, ic, l]) => <button key={k} className={`chip ${(user.focus_zone || "full") === k ? "on" : ""}`} disabled={zoneBusy} onClick={() => pickZone(k)}>{ic} {l}</button>)}</div>
+        <div className="eyebrow" style={{ marginBottom: 10 }}>Акцент тренировок</div>
+        <div style={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 16, padding: "16px 12px", marginBottom: 14 }}>
+          <BodyMap zone={(user.focus_zone || "full") as ZoneKey} size={120} />
+          <div className="chips" style={{ justifyContent: "center", marginTop: 12 }}>
+            {ZONE_LABELS.map(([k, l]) => (
+              <button key={k} className={`chip ${(user.focus_zone || "full") === k ? "on" : ""}`} disabled={zoneBusy} onClick={() => pickZone(k)}>{l}</button>
+            ))}
+          </div>
+        </div>
         {zoneBusy && <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 10 }}>Пересобираем план…</div>}
         <Btn kind="ghost" onClick={onRedo}>Изменить анкету и пересобрать план</Btn></Card>
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Внешний вид</div>

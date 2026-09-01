@@ -32,3 +32,9 @@ class SettingsIn(BaseModel):
 
 class AppFeedbackIn(BaseModel):
     liked: bool | None = None; comment: str = ""
+
+class FriendInviteIn(BaseModel):
+    code: str
+
+class FriendMessageIn(BaseModel):
+    text: str = Field(min_length=1, max_length=2000)
