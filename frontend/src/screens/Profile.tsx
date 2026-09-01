@@ -3,7 +3,7 @@ import { Btn, Card } from "../components/UI";
 import { api, User } from "../api";
 import { EQUIP, ZONES } from "./Onboarding";
 import { THEME_PRESETS, getTheme, setTheme } from "../theme";
-import { openLink } from "../tg";
+import { openLink, getMode, setMode, ThemeMode } from "../tg";
 import { NAV_ITEMS, NavId, setNavOrder as saveNavOrder } from "../navPrefs";
 import { clearSession } from "./Workout";
 const CREATOR_LINK = "https://polinapeiv.taplink.ws";
@@ -13,6 +13,8 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
   const [busy, setBusy] = useState(""); const eqLabel = (k: string) => EQUIP.find(e => e[0] === k)?.[1] || k;
   const zoneLabel = (k?: string) => ZONES.find(z => z[0] === k)?.[2] || "Без акцента";
   const [theme, setThemeState] = useState(getTheme());
+  const [mode, setModeState] = useState<ThemeMode>(getMode());
+  const pickMode = (m: ThemeMode) => { setModeState(m); setMode(m); };
   const [showCoachInfo, setShowCoachInfo] = useState(false);
   const applyNav = (ids: NavId[]) => { saveNavOrder(ids); onNavChange(ids); };
   const toggleNavItem = (id: NavId) => {
@@ -65,6 +67,15 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
         <Btn kind="ghost" onClick={onRedo}>Изменить анкету и пересобрать план</Btn></Card>
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Внешний вид</div>
       <Card>
+        <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 10 }}>Тема</div>
+        <div className="row" style={{ gap: 6, background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14, padding: 4, marginBottom: 16 }}>
+          {([["system", "Система"], ["light", "Светлая"], ["dark", "Тёмная"]] as [ThemeMode, string][]).map(([m, l]) => (
+            <button key={m} onClick={() => pickMode(m)}
+              style={{ flex: 1, border: 0, borderRadius: 11, padding: "9px 0", fontSize: 13, fontWeight: 600, cursor: "pointer",
+                background: mode === m ? "var(--card)" : "transparent", color: mode === m ? "var(--ink)" : "var(--muted)",
+                boxShadow: mode === m ? "var(--shadow)" : "none" }}>{l}</button>
+          ))}
+        </div>
         <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 12 }}>Цвет приложения</div>
         <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
           {THEME_PRESETS.map(t => (
