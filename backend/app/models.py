@@ -32,6 +32,7 @@ class User(Base):
     taplink_url: Mapped[str | None] = mapped_column(String(256))
     focus_zone: Mapped[str | None] = mapped_column(String(16))  # акцентная зона: glutes/abs/arms/back/chest/legs/full
     friend_code: Mapped[str | None] = mapped_column(String(12), unique=True, index=True)  # код для добавления в друзья
+    last_seen_app_version: Mapped[str | None] = mapped_column(String(16))  # последняя версия «что нового», которую видел; NULL — ни разу
 
 class Program(Base):
     __tablename__ = "programs"
@@ -137,3 +138,5 @@ class FriendMessage(Base):
     text: Mapped[str] = mapped_column(Text)
     read: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    kind: Mapped[str] = mapped_column(String(16), default="text")  # text | workout_share
+    payload: Mapped[dict | None] = mapped_column(JSON)  # снимок данных для kind != "text" (напр. поделиться тренировкой)

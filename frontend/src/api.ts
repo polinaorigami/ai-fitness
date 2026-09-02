@@ -43,6 +43,11 @@ export const api = {
   friendRemove: (fid: number) => req<{ ok: boolean }>("DELETE", `/api/friends/${fid}`),
   friendMessages: (fid: number, after = 0) => req<FriendMsg[]>("GET", `/api/friends/${fid}/messages?after=${after}`),
   friendSend: (fid: number, text: string) => req<FriendMsg>("POST", `/api/friends/${fid}/messages`, { text }),
+  shareWorkout: (fid: number, sessionId: number) => req<FriendMsg>("POST", `/api/friends/${fid}/share-workout`, { session_id: sessionId }),
+  recentSessions: (limit = 10) => req<RecentSession[]>("GET", `/api/session/recent?limit=${limit}`),
+  // «что нового»
+  whatsnew: () => req<WhatsNewData>("GET", "/api/whatsnew"),
+  whatsnewSeen: () => req<{ ok: boolean }>("POST", "/api/whatsnew/seen"),
 };
 export type User = { id: number; first_name: string; username?: string; photo_url?: string; goal?: string; days_per_week?: number; location?: string; minutes?: number; level?: string; age?: number; height_cm?: number; weight_kg?: number; sex?: string; equipment: string[]; onboarded: boolean; remind_workout: boolean; remind_rest: boolean; weekly_report: boolean; remind_progress: boolean; workout_time: string; timezone_offset: number; taplink_url?: string; focus_zone?: string };
 export type Exercise = { id: string; name: string; group: string; group_label: string; equipment_labels: string[]; level_label: string; description: string; technique: string; mistakes: string; youtube_url: string | null };
@@ -55,6 +60,10 @@ export type Progress = { streak: number; workouts: number; total_minutes: number
 export type PhotoT = { id: number; label: string; kind: string; created_at: string };
 export type Msg = { role: "user" | "ai"; text: string; actions: string[] };
 export type FriendBrief = { id: number; first_name: string; username?: string | null; photo_url?: string | null };
-export type FriendsData = { code: string; friends: (FriendBrief & { unread: number })[]; incoming: number };
+export type FriendsData = { code: string; friends: (FriendBrief & { unread: number; last_message: string | null; last_message_at: string | null; last_message_mine: boolean })[]; incoming: number };
 export type FriendInviteT = { invite_id: number; user: FriendBrief };
-export type FriendMsg = { id: number; from_me: boolean; text: string; at: string };
+export type WorkoutSharePayload = { title: string; exercises_total: number; duration_sec: number };
+export type FriendMsg = { id: number; from_me: boolean; text: string; at: string; kind: "text" | "workout_share"; payload: WorkoutSharePayload | null };
+export type RecentSession = { id: number; title: string; exercises_total: number; duration_sec: number; finished_at: string };
+export type WhatsNewItem = { icon: string; title: string; desc: string };
+export type WhatsNewData = { version: string; seen: boolean; title: string; items: WhatsNewItem[] };

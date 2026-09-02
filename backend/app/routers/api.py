@@ -13,6 +13,7 @@ from ..exercises import EXERCISES, BY_ID
 from ..program_generator import generate, WEEKDAYS
 from ..ai.provider import get_provider
 from ..config import UPLOAD_DIR, BOT_TOKEN, ADMIN_CHAT_ID
+from ..whatsnew import APP_VERSION, WHATSNEW_CONTENT
 
 r = APIRouter(prefix="/api")
 ai = get_provider()
@@ -48,6 +49,18 @@ def onboarding(body: OnboardingIn, user: User = Depends(current_user), db: Sessi
 def settings(body: SettingsIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
     for k, v in body.model_dump(exclude_none=True).items(): setattr(user, k, v)
     db.commit(); return _u(user)
+
+# ---- «что нового» ----
+@r.get("/whatsnew")
+def whatsnew(user: User = Depends(current_user)):
+    return {"version": APP_VERSION, "seen": user.last_seen_app_version == APP_VERSION,
+            "title": WHATSNEW_CONTENT["title"], "items": WHATSNEW_CONTENT["items"]}
+
+@r.post("/whatsnew/seen")
+def whatsnew_seen(user: User = Depends(current_user), db: Session = Depends(get_db)):
+    user.last_seen_app_version = APP_VERSION
+    db.commit()
+    return {"ok": True}
 
 # ---- упражнения ----
 @r.get("/exercises")
@@ -156,6 +169,15 @@ def session_finish(sid: int, body: SessionFinish, user: User = Depends(current_u
     db.commit()
     return {"duration_sec": s.duration_sec, "exercises": s.exercises_total, "sets_done": s.sets_done,
             "sets_total": s.sets_total, "percent": round(100*s.sets_done/max(1,s.sets_total)), "streak": _streak(db, user.id)}
+
+@r.get("/session/recent")
+def session_recent(limit: int = 10, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Последние завершённые тренировки пользователя — для карточки «поделиться тренировкой» в чате."""
+    limit = max(1, min(50, limit))
+    sess = list(db.scalars(select(WorkoutSession).where(WorkoutSession.user_id == user.id, WorkoutSession.finished_at != None)
+                            .order_by(WorkoutSession.finished_at.desc()).limit(limit)))
+    return [{"id": s.id, "title": s.title, "exercises_total": s.exercises_total,
+             "duration_sec": s.duration_sec, "finished_at": s.finished_at.isoformat()} for s in sess]
 
 @r.post("/session/{sid}/feedback")
 def session_feedback(sid: int, body: FeedbackIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
@@ -319,8 +341,22 @@ def friends_list(user: User = Depends(current_user), db: Session = Depends(get_d
     unread = {}
     for m in db.scalars(select(FriendMessage).where(FriendMessage.to_id == user.id, FriendMessage.read == False)):
         unread[m.from_id] = unread.get(m.from_id, 0) + 1
+    # последнее сообщение переписки с каждым другом (один запрос по всем друзьям сразу, без N+1)
+    last_msg = {}
+    if fids:
+        q = select(FriendMessage).where(
+            ((FriendMessage.from_id == user.id) & (FriendMessage.to_id.in_(fids))) |
+            ((FriendMessage.to_id == user.id) & (FriendMessage.from_id.in_(fids)))
+        ).order_by(FriendMessage.created_at)
+        for m in db.scalars(q):
+            other = m.to_id if m.from_id == user.id else m.from_id
+            last_msg[other] = m  # порядок по возрастанию даты — последняя запись перезаписывает предыдущую
     for f in friends:
         f["unread"] = unread.get(f["id"], 0)
+        m = last_msg.get(f["id"])
+        f["last_message"] = (m.text if m.kind == "text" else "🏋️ Тренировка") if m else None
+        f["last_message_at"] = m.created_at.isoformat() if m else None
+        f["last_message_mine"] = (m.from_id == user.id) if m else False
     return {"code": f"AI-{code}", "friends": friends, "incoming": incoming}
 
 @r.post("/friends/invite")
@@ -407,7 +443,8 @@ def friend_messages(fid: int, after: int = 0, user: User = Depends(current_user)
             m.read = True; changed = True
     if changed:
         db.commit()
-    return [{"id": m.id, "from_me": m.from_id == user.id, "text": m.text, "at": m.created_at.isoformat()} for m in msgs]
+    return [{"id": m.id, "from_me": m.from_id == user.id, "text": m.text, "at": m.created_at.isoformat(),
+             "kind": m.kind, "payload": m.payload} for m in msgs]
 
 @r.post("/friends/{fid}/messages")
 def friend_send(fid: int, body: FriendMessageIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
@@ -415,4 +452,16 @@ def friend_send(fid: int, body: FriendMessageIn, user: User = Depends(current_us
         raise HTTPException(403, "Вы не друзья")
     m = FriendMessage(from_id=user.id, to_id=fid, text=body.text.strip())
     db.add(m); db.commit()
-    return {"id": m.id, "from_me": True, "text": m.text, "at": m.created_at.isoformat()}
+    return {"id": m.id, "from_me": True, "text": m.text, "at": m.created_at.isoformat(), "kind": m.kind, "payload": m.payload}
+
+@r.post("/friends/{fid}/share-workout")
+def friend_share_workout(fid: int, body: ShareWorkoutIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    if not _are_friends(db, user.id, fid):
+        raise HTTPException(403, "Вы не друзья")
+    s = db.get(WorkoutSession, body.session_id)
+    if not s or s.user_id != user.id:
+        raise HTTPException(404, "Тренировка не найдена")
+    payload = {"title": s.title, "exercises_total": s.exercises_total, "duration_sec": s.duration_sec}
+    m = FriendMessage(from_id=user.id, to_id=fid, text="", kind="workout_share", payload=payload)
+    db.add(m); db.commit()
+    return {"id": m.id, "from_me": True, "text": m.text, "at": m.created_at.isoformat(), "kind": m.kind, "payload": m.payload}

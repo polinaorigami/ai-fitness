@@ -1,7 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { Btn, Card, Loading, Err } from "../components/UI";
-import { api, User, FriendsData, FriendInviteT, FriendMsg, FriendBrief } from "../api";
+import { Btn, Card, Loading, Err, fmtMin } from "../components/UI";
+import { api, User, FriendsData, FriendInviteT, FriendMsg, FriendBrief, RecentSession } from "../api";
 import { haptic, notify } from "../tg";
+
+// Относительное время для превью последнего сообщения в списке друзей.
+function timeAgo(iso: string): string {
+  const then = new Date(iso).getTime();
+  const diffMin = Math.max(0, Math.floor((Date.now() - then) / 60000));
+  if (diffMin < 1) return "сейчас";
+  if (diffMin < 60) return `${diffMin} мин`;
+  const diffH = Math.floor(diffMin / 60);
+  if (diffH < 24) return `${diffH} ч`;
+  const diffD = Math.floor(diffH / 24);
+  if (diffD === 1) return "вчера";
+  if (diffD < 7) return `${diffD} дн`;
+  return new Date(iso).toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
+}
 
 // Безопасное копирование: navigator.clipboard может отсутствовать/бросать в Telegram WebView.
 function copyText(text: string): boolean {
@@ -127,16 +141,25 @@ export default function Friends({ user }: { user: User }) {
         friends.length > 0 ? (
           <>
             {friends.map(f => (
-              <Card key={f.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 12, marginBottom: 10 }}>
-                <div className="row" style={{ gap: 12 }}>
+              <Card key={f.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 12, marginBottom: 10, gap: 10 }}>
+                <div className="row" style={{ gap: 12, minWidth: 0, flex: 1 }}>
                   <Avatar f={f} size={44} />
-                  <div>
+                  <div style={{ minWidth: 0, flex: 1 }}>
                     <div style={{ fontWeight: 600 }}>{f.first_name}</div>
-                    {f.username && <div style={{ fontSize: 12, color: "var(--muted)" }}>@{f.username}</div>}
+                    {f.last_message ? (
+                      <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginTop: 2 }}>
+                        <span style={{ fontSize: 12.5, color: "var(--muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>
+                          {f.last_message_mine ? "Вы: " : ""}{f.last_message}
+                        </span>
+                        <span style={{ fontSize: 11, color: "var(--faint)", flexShrink: 0 }}>· {timeAgo(f.last_message_at!)}</span>
+                      </div>
+                    ) : f.username ? (
+                      <div style={{ fontSize: 12, color: "var(--muted)" }}>@{f.username}</div>
+                    ) : null}
                   </div>
                 </div>
                 <button onClick={() => { haptic(); setChatWith(f); }}
-                  style={{ position: "relative", padding: "8px 16px", fontSize: 13, fontWeight: 600, border: "1px solid var(--line)", borderRadius: 10, background: "var(--surface)", cursor: "pointer", color: "var(--ink)" }}>
+                  style={{ position: "relative", flexShrink: 0, padding: "8px 16px", fontSize: 13, fontWeight: 600, border: "1px solid var(--line)", borderRadius: 10, background: "var(--surface)", cursor: "pointer", color: "var(--ink)" }}>
                   Чат
                   {f.unread > 0 && <span style={{ position: "absolute", top: -6, right: -6, minWidth: 18, height: 18, padding: "0 5px", borderRadius: 9, background: "var(--accent)", color: "var(--accent-ink)", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{f.unread}</span>}
                 </button>
@@ -229,12 +252,39 @@ export default function Friends({ user }: { user: User }) {
   );
 }
 
+// Карточка тренировки внутри сообщения (kind === "workout_share").
+function WorkoutShareCard({ p, mine }: { p: { title: string; exercises_total: number; duration_sec: number }; mine: boolean }) {
+  return (
+    <div style={{
+      display: "flex", alignItems: "center", gap: 12, padding: 14, maxWidth: 260,
+      background: mine ? "color-mix(in srgb, var(--ink) 92%, var(--accent))" : "var(--card)",
+      border: mine ? "none" : "1px solid var(--line)", borderRadius: 16,
+      borderBottomRightRadius: mine ? 6 : 16, borderBottomLeftRadius: mine ? 16 : 6,
+      boxShadow: mine ? "none" : "var(--shadow)",
+    }}>
+      <div style={{
+        width: 40, height: 40, borderRadius: 12, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+        background: mine ? "rgba(255,255,255,.14)" : "var(--accent-soft)", color: mine ? "#fff" : "var(--accent)",
+      }}>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6.5 6.5l11 11" /><path d="M4 8l2.5-2.5L9 8l-2.5 2.5z" /><path d="M15 15l2.5-2.5L20 15l-2.5 2.5z" /><path d="M4 4l2 2M18 18l2 2" /></svg>
+      </div>
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontWeight: 700, fontSize: 14, color: mine ? "#fff" : "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title}</div>
+        <div style={{ fontSize: 12.5, color: mine ? "rgba(255,255,255,.75)" : "var(--muted)", marginTop: 2 }}>{p.exercises_total} упражнений · {fmtMin(p.duration_sec)}</div>
+      </div>
+    </div>
+  );
+}
+
 // --- Личный чат с другом (polling каждые 3 с) ---
 function Chat({ friend, onBack }: { friend: FriendBrief; onBack: () => void }) {
   const [msgs, setMsgs] = useState<FriendMsg[]>([]);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [showShare, setShowShare] = useState(false);
+  const [sessions, setSessions] = useState<RecentSession[] | null>(null);
+  const [sharing, setSharing] = useState<number | null>(null);
   const lastId = useRef(0);
   const endRef = useRef<HTMLDivElement>(null);
   const bump = (list: FriendMsg[]) => { if (list.length) lastId.current = Math.max(lastId.current, ...list.map(m => m.id)); };
@@ -264,12 +314,32 @@ function Chat({ friend, onBack }: { friend: FriendBrief; onBack: () => void }) {
     catch { setText(t); } finally { setSending(false); }
   };
 
+  const openShare = async () => {
+    haptic();
+    setShowShare(true);
+    if (sessions === null) {
+      try { setSessions(await api.recentSessions(10)); } catch { setSessions([]); }
+    }
+  };
+  const shareWorkout = async (sessionId: number) => {
+    if (sharing) return;
+    setSharing(sessionId);
+    try {
+      const m = await api.shareWorkout(friend.id, sessionId);
+      setMsgs(prev => [...prev, m]); bump([m]);
+      setShowShare(false);
+    } catch { /* тихо игнорируем — пользователь может попробовать ещё раз */ }
+    finally { setSharing(null); }
+  };
+
   return (
     <div className="screen no-nav" style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <div className="row between" style={{ marginBottom: 8 }}>
+      {/* paddingRight резервирует место под глобальный плеер (MusicWidget), который по умолчанию
+          сидит в правом верхнем углу — иначе имя друга уходит под него и обрезается. */}
+      <div className="row between" style={{ marginBottom: 8, paddingRight: 64 }}>
         <button className="btn ghost sm" onClick={onBack}>Назад</button>
-        <div className="row" style={{ gap: 8 }}>
-          <span style={{ fontWeight: 600 }}>{friend.first_name}</span>
+        <div className="row" style={{ gap: 8, minWidth: 0 }}>
+          <span style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 130 }}>{friend.first_name}</span>
           <Avatar f={friend} size={32} />
         </div>
       </div>
@@ -282,15 +352,51 @@ function Chat({ friend, onBack }: { friend: FriendBrief; onBack: () => void }) {
             </div>
           ) : msgs.map(m => (
             <div key={m.id} style={{ display: "flex", justifyContent: m.from_me ? "flex-end" : "flex-start" }}>
-              <div className={`bubble ${m.from_me ? "user" : "ai"}`}>{m.text}</div>
+              {m.kind === "workout_share" && m.payload
+                ? <WorkoutShareCard p={m.payload} mine={m.from_me} />
+                : <div className={`bubble ${m.from_me ? "user" : "ai"}`}>{m.text}</div>}
             </div>
           ))}
         <div ref={endRef} />
       </div>
       <div className="row" style={{ position: "sticky", bottom: "var(--safe-b)", background: "var(--bg)", paddingTop: 8, gap: 8 }}>
+        <button onClick={openShare} aria-label="Поделиться тренировкой"
+          style={{ flexShrink: 0, width: 52, height: 52, borderRadius: 14, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6.5 6.5l11 11" /><path d="M4 8l2.5-2.5L9 8l-2.5 2.5z" /><path d="M15 15l2.5-2.5L20 15l-2.5 2.5z" /><path d="M4 4l2 2M18 18l2 2" /></svg>
+        </button>
         <input placeholder="Сообщение…" value={text} onChange={e => setText(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} />
         <button className="btn accent sm" style={{ height: 52, width: 52 }} onClick={send} disabled={sending || !text.trim()}>→</button>
       </div>
+
+      {/* Поделиться тренировкой — bottom sheet */}
+      {showShare && (
+        <div onClick={() => setShowShare(false)} style={{ position: "fixed", inset: 0, background: "var(--sheet-scrim)", display: "flex", alignItems: "flex-end", zIndex: 100 }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderRadius: "20px 20px 0 0", padding: 24, paddingBottom: "calc(24px + var(--safe-b))", maxHeight: "70vh", overflowY: "auto", animation: "rise .3s ease" }}>
+            <div style={{ textAlign: "center", marginBottom: 18 }}>
+              <h2 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 700 }}>Поделиться тренировкой</h2>
+              <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>Выбери завершённую тренировку</p>
+            </div>
+            {sessions === null ? (
+              <div style={{ color: "var(--muted)", textAlign: "center", padding: "20px 0" }}>Загрузка…</div>
+            ) : sessions.length === 0 ? (
+              <div style={{ color: "var(--muted)", textAlign: "center", padding: "20px 0" }}>Пока нет завершённых тренировок</div>
+            ) : (
+              <div className="stack">
+                {sessions.map(s => (
+                  <button key={s.id} onClick={() => shareWorkout(s.id)} disabled={sharing !== null}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", textAlign: "left", background: "var(--card)", border: "1px solid var(--line)", borderRadius: 14, padding: "12px 14px", cursor: sharing !== null ? "default" : "pointer", opacity: sharing !== null && sharing !== s.id ? 0.5 : 1 }}>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: 14 }}>{s.title}</div>
+                      <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 2 }}>{s.exercises_total} упражнений · {fmtMin(s.duration_sec)}</div>
+                    </div>
+                    <span style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600 }}>{sharing === s.id ? "…" : "Отправить"}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

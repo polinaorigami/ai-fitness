@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, User, ProgramT, Today, Exercise, Day } from "./api";
+import { api, User, ProgramT, Today, Exercise, Day, WhatsNewData } from "./api";
 import { initTelegram, tzOffset } from "./tg";
 import { initTheme } from "./theme";
 import { Nav, Loading, Btn, Err } from "./components/UI";
@@ -12,28 +12,6 @@ import Home from "./screens/Home"; import Schedule from "./screens/Schedule"; im
 
 type Screen = "loading" | "welcome" | "onboarding" | "photos" | "analysis" | "whatsnew" | "home" | "schedule" | "workout" | "progress" | "friends" | "mind" | "achievements" | "profile" | "coach";
 
-const WHATSNEW_KEY = "aifitness_whatsnew_seen";
-const WHATSNEW_HOURS = 4; // Show WhatsNew if app hasn't been opened for 4+ hours
-
-function shouldShowWhatsNew(): boolean {
-  try {
-    const lastSeen = localStorage.getItem(WHATSNEW_KEY);
-    if (!lastSeen) return true; // First time
-    const lastTime = parseInt(lastSeen, 10);
-    const now = Date.now();
-    const hoursSinceLastSeen = (now - lastTime) / (1000 * 60 * 60);
-    return hoursSinceLastSeen >= WHATSNEW_HOURS;
-  } catch {
-    return true;
-  }
-}
-
-function markWhatsNewSeen() {
-  try {
-    localStorage.setItem(WHATSNEW_KEY, Date.now().toString());
-  } catch {}
-}
-
 export default function App() {
   const [screen, setScreen] = useState<Screen>("loading");
   const [user, setUser] = useState<User | null>(null);
@@ -44,6 +22,7 @@ export default function App() {
   const [err, setErr] = useState("");
   const [navOrder, setNavOrderState] = useState<NavId[]>(getNavOrder());
   const [showTour, setShowTour] = useState(false);
+  const [whatsNew, setWhatsNew] = useState<WhatsNewData | null>(null);
 
   const refresh = async () => { const [p, t] = await Promise.all([api.program(), api.today()]); setProgram(p); setToday(t); };
   useEffect(() => { initTelegram(); initTheme(); (async () => {
@@ -59,11 +38,11 @@ export default function App() {
         if (activeDay !== null && p.week[activeDay] && !p.week[activeDay].rest) {
           setWk({ day: p.week[activeDay], index: activeDay }); setScreen("workout");
         } else {
-          if (shouldShowWhatsNew()) {
-            setScreen("whatsnew");
-          } else {
-            setScreen("home");
-          }
+          try {
+            const wn = await api.whatsnew();
+            if (!wn.seen) { setWhatsNew(wn); setScreen("whatsnew"); }
+            else setScreen("home");
+          } catch { setScreen("home"); }
         }
       } catch { setScreen("analysis"); }
     } catch (e: any) { setErr(e.message); }
@@ -87,8 +66,15 @@ export default function App() {
   if (screen === "welcome") return <Welcome onNext={() => setScreen("onboarding")} />;
   if (screen === "onboarding") return <><MusicWidget /><Onboarding onDone={async () => { setUser(await api.me()); setScreen("photos"); }} /></>;
   if (screen === "photos") return <><MusicWidget /><Photos onDone={() => setScreen("analysis")} /></>;
-  if (screen === "analysis") return <><MusicWidget /><Analysis onDone={async () => { await refresh(); setScreen("whatsnew"); }} /></>;
-  if (screen === "whatsnew") return <WhatsNew onNext={() => { markWhatsNewSeen(); setScreen("home"); }} />;
+  if (screen === "analysis") return <><MusicWidget /><Analysis onDone={async () => {
+    await refresh();
+    // Пользователь только что впервые прошёл онбординг — «что нового» на первом запуске
+    // не показываем (это сбивает с толку тех, кто ещё не видел прошлую версию), но версию
+    // отмечаем как увиденную молча, чтобы она не всплыла на следующем открытии приложения.
+    api.whatsnewSeen().catch(() => {});
+    setScreen("home");
+  }} /></>;
+  if (screen === "whatsnew" && whatsNew) return <WhatsNew data={whatsNew} onNext={() => setScreen("home")} />;
   if (screen === "workout" && wk) return <><MusicWidget /><Workout day={wk.day} dayIndex={wk.index} exercises={exercises} onExit={async () => { await refresh(); setScreen("home"); }} /></>;
   if (screen === "coach") return <><MusicWidget /><Coach onBack={() => setScreen("home")} onProgramChanged={refresh} /></>;
   if (!program || !today) return <Loading />;

@@ -38,3 +38,6 @@ class FriendInviteIn(BaseModel):
 
 class FriendMessageIn(BaseModel):
     text: str = Field(min_length=1, max_length=2000)
+
+class ShareWorkoutIn(BaseModel):
+    session_id: int
