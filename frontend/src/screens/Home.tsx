@@ -96,21 +96,22 @@ export default function Home({ user, today, program, onStart, onDuration, go, qu
       {showTime && (
         <div onClick={() => !busyMin && setShowTime(false)} className="sheet-overlay">
           <div onClick={e => e.stopPropagation()} className="sheet-card" style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderRadius: "20px 20px 0 0", padding: 24, paddingBottom: "calc(24px + var(--safe-b))", animation: "rise .3s ease" }}>
-            <div style={{ textAlign: "center", marginBottom: 18 }}>
-              <h2 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 700 }}>Сколько у тебя времени?</h2>
-              <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>Подберём тренировку под доступное время</p>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              <div style={{ textAlign: "center", marginBottom: 18 }}>
+                <h2 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 700 }}>Сколько у тебя времени?</h2>
+                <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>Подберём тренировку под доступное время</p>
+              </div>
+              <div className="grid2" style={{ gap: 10 }}>
+                {DURATIONS.map(([m, label]) => (
+                  <button key={m} onClick={() => pickTime(m)} disabled={busyMin !== null}
+                    style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "16px 10px", borderRadius: 14, border: "1px solid var(--line)", background: busyMin === m ? "var(--accent-soft)" : "var(--card)", cursor: "pointer", color: "var(--ink)", opacity: busyMin !== null && busyMin !== m ? 0.5 : 1 }}>
+                    <span style={{ fontSize: 22, fontWeight: 800, fontFamily: "var(--display)" }}>{busyMin === m ? "…" : m}</span>
+                    <span style={{ fontSize: 12, color: "var(--muted)" }}>{busyMin === m ? "собираем" : `мин · ${label}`}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="grid2" style={{ gap: 10 }}>
-              {DURATIONS.map(([m, label]) => (
-                <button key={m} onClick={() => pickTime(m)} disabled={busyMin !== null}
-                  style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "16px 10px", borderRadius: 14, border: "1px solid var(--line)", background: busyMin === m ? "var(--accent-soft)" : "var(--card)", cursor: "pointer", color: "var(--ink)", opacity: busyMin !== null && busyMin !== m ? 0.5 : 1 }}>
-                  <span style={{ fontSize: 22, fontWeight: 800, fontFamily: "var(--display)" }}>{busyMin === m ? "…" : m}</span>
-                  <span style={{ fontSize: 12, color: "var(--muted)" }}>{busyMin === m ? "собираем" : `мин · ${label}`}</span>
-                </button>
-              ))}
-            </div>
-            <div style={{ height: 12 }} />
-            <Btn kind="ghost" onClick={() => setShowTime(false)} disabled={busyMin !== null}>Отмена</Btn>
+            <Btn kind="ghost" onClick={() => setShowTime(false)} disabled={busyMin !== null} style={{ marginTop: 12 }}>Отмена</Btn>
           </div>
         </div>
       )}

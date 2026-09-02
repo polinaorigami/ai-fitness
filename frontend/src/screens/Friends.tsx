@@ -230,14 +230,16 @@ export default function Friends({ user }: { user: User }) {
       {showAdd && (
         <div onClick={() => setShowAdd(false)} className="sheet-overlay">
           <div onClick={e => e.stopPropagation()} className="sheet-card" style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderRadius: "20px 20px 0 0", padding: 24, paddingBottom: "calc(24px + var(--safe-b))", animation: "rise .3s ease" }}>
-            <div style={{ textAlign: "center", marginBottom: 18 }}>
-              <h2 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 700 }}>Добавить друга</h2>
-              <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>Введи код приглашения друга</p>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              <div style={{ textAlign: "center", marginBottom: 18 }}>
+                <h2 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 700 }}>Добавить друга</h2>
+                <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>Введи код приглашения друга</p>
+              </div>
+              <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="AI-XXXXXX" autoFocus
+                onKeyDown={e => e.key === "Enter" && addFriend()}
+                style={{ width: "100%", textAlign: "center", fontSize: 20, fontWeight: 700, letterSpacing: ".08em", fontFamily: "var(--display)", marginBottom: 16 }} />
             </div>
-            <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="AI-XXXXXX" autoFocus
-              onKeyDown={e => e.key === "Enter" && addFriend()}
-              style={{ width: "100%", textAlign: "center", fontSize: 20, fontWeight: 700, letterSpacing: ".08em", fontFamily: "var(--display)", marginBottom: 16 }} />
-            <div className="row" style={{ gap: 10 }}>
+            <div className="row" style={{ gap: 10, marginTop: "auto" }}>
               <Btn kind="ghost" onClick={() => setShowAdd(false)} style={{ flex: 1 }}>Отмена</Btn>
               <Btn kind="accent" onClick={addFriend} disabled={!code.trim() || adding} style={{ flex: 1 }}>{adding ? "…" : "Добавить"}</Btn>
             </div>
@@ -380,29 +382,31 @@ function Chat({ friend, onBack }: { friend: FriendBrief; onBack: () => void }) {
       {/* Поделиться тренировкой — bottom sheet */}
       {showShare && (
         <div onClick={() => setShowShare(false)} className="sheet-overlay">
-          <div onClick={e => e.stopPropagation()} className="sheet-card" style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderRadius: "20px 20px 0 0", padding: 24, paddingBottom: "calc(24px + var(--safe-b))", maxHeight: "70vh", overflowY: "auto", animation: "rise .3s ease" }}>
+          <div onClick={e => e.stopPropagation()} className="sheet-card" style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderRadius: "20px 20px 0 0", padding: 24, paddingBottom: "calc(24px + var(--safe-b))", animation: "rise .3s ease" }}>
             <div style={{ textAlign: "center", marginBottom: 18 }}>
               <h2 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 700 }}>Поделиться тренировкой</h2>
               <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>Выбери завершённую тренировку</p>
             </div>
-            {sessions === null ? (
-              <div style={{ color: "var(--muted)", textAlign: "center", padding: "20px 0" }}>Загрузка…</div>
-            ) : sessions.length === 0 ? (
-              <div style={{ color: "var(--muted)", textAlign: "center", padding: "20px 0" }}>Пока нет завершённых тренировок</div>
-            ) : (
-              <div className="stack">
-                {sessions.map(s => (
-                  <button key={s.id} onClick={() => shareWorkout(s.id)} disabled={sharing !== null}
-                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", textAlign: "left", background: "var(--card)", border: "1px solid var(--line)", borderRadius: 14, padding: "12px 14px", cursor: sharing !== null ? "default" : "pointer", opacity: sharing !== null && sharing !== s.id ? 0.5 : 1 }}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: 14 }}>{s.title}</div>
-                      <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 2 }}>{s.exercises_total} упражнений · {fmtMin(s.duration_sec)}</div>
-                    </div>
-                    <span style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600 }}>{sharing === s.id ? "…" : "Отправить"}</span>
-                  </button>
-                ))}
-              </div>
-            )}
+            <div style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+              {sessions === null ? (
+                <div style={{ color: "var(--muted)", textAlign: "center", padding: "20px 0" }}>Загрузка…</div>
+              ) : sessions.length === 0 ? (
+                <div style={{ color: "var(--muted)", textAlign: "center", padding: "20px 0" }}>Пока нет завершённых тренировок</div>
+              ) : (
+                <div className="stack">
+                  {sessions.map(s => (
+                    <button key={s.id} onClick={() => shareWorkout(s.id)} disabled={sharing !== null}
+                      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", textAlign: "left", background: "var(--card)", border: "1px solid var(--line)", borderRadius: 14, padding: "12px 14px", cursor: sharing !== null ? "default" : "pointer", opacity: sharing !== null && sharing !== s.id ? 0.5 : 1 }}>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: 14 }}>{s.title}</div>
+                        <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 2 }}>{s.exercises_total} упражнений · {fmtMin(s.duration_sec)}</div>
+                      </div>
+                      <span style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600 }}>{sharing === s.id ? "…" : "Отправить"}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
