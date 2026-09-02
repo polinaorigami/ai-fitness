@@ -89,7 +89,7 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
       <div className="eyebrow" style={{ marginTop: 12 }}>{day.weekday}</div>
       <h1 className="display">{day.title.toUpperCase()}</h1>
       <p className="sub">{day.exercises.length} упражнений · {totalSets} подходов</p>
-      <Card>{day.exercises.map((x, i) => <div key={i} className="ex-row"><span className="ex-num">{i + 1}</span><div style={{ flex: 1 }}><div style={{ fontWeight: 500 }}>{x.name}</div><div style={{ fontSize: 13, color: "var(--muted)" }}>{x.sets} × {x.reps}{x.weight_kg ? ` · ${x.weight_kg} кг` : ""}</div></div></div>)}</Card>
+      <Card className="glass">{day.exercises.map((x, i) => <div key={i} className="ex-row"><span className="ex-num">{i + 1}</span><div style={{ flex: 1 }}><div style={{ fontWeight: 500 }}>{x.name}</div><div style={{ fontSize: 13, color: "var(--muted)" }}>{x.sets} × {x.reps}{x.weight_kg ? ` · ${x.weight_kg} кг` : ""}</div></div></div>)}</Card>
       {err && <div className="err">{err}</div>}
       <div style={{ height: 8 }} />
       <Btn kind="accent" onClick={begin}>Начать тренировку</Btn>
@@ -115,7 +115,7 @@ export default function Workout({ day, dayIndex, exercises, onExit }: { day: Day
           <div className="stat"><div className="v">{cur.rest_sec}<span style={{ fontSize: 14 }}> с</span></div><div className="l">отдых</div></div>
           <div className="stat"><div className="v">{cur.weight_kg || "—"}{cur.weight_kg ? <span style={{ fontSize: 14 }}> кг</span> : ""}</div><div className="l">{cur.weight_kg ? "вес" : "свой вес"}</div></div>
         </div>
-        {how && ex && <Card><div className="eyebrow">📖 Техника выполнения</div><p style={{ fontSize: 15, marginTop: 10, marginBottom: 16, lineHeight: 1.6 }}>{ex.technique}</p><div className="eyebrow" style={{ marginTop: 16 }}>⚠️ Типичные ошибки</div><p style={{ fontSize: 15, color: "var(--muted)", marginTop: 10, lineHeight: 1.6 }}>{ex.mistakes}</p></Card>}
+        {how && ex && <Card className="glass"><div className="eyebrow">📖 Техника выполнения</div><p style={{ fontSize: 15, marginTop: 10, marginBottom: 16, lineHeight: 1.6 }}>{ex.technique}</p><div className="eyebrow" style={{ marginTop: 16 }}>⚠️ Типичные ошибки</div><p style={{ fontSize: 15, color: "var(--muted)", marginTop: 10, lineHeight: 1.6 }}>{ex.mistakes}</p></Card>}
         <div className="stack">
           <Btn kind="accent" onClick={() => setPhase("set")}>Начать подход {si}</Btn>
           <Btn kind="ghost" onClick={() => setHow(!how)}>{how ? "▲ Скрыть" : "▼ Как выполнять"}</Btn>

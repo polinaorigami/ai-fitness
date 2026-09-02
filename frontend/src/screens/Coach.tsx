@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api, Msg } from "../api";
 import { haptic } from "../tg";
+import { IconBtn } from "../components/UI";
 export default function Coach({ onBack, onProgramChanged }: { onBack: () => void; onProgramChanged: () => void }) {
   const [msgs, setMsgs] = useState<Msg[]>([]); const [text, setText] = useState(""); const [busy, setBusy] = useState(false);
   const end = useRef<HTMLDivElement>(null);
@@ -22,7 +23,12 @@ export default function Coach({ onBack, onProgramChanged }: { onBack: () => void
   };
   return (
     <div className="screen no-nav" style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <div className="row between"><button className="btn ghost sm" onClick={onBack}>Назад</button><span className="eyebrow">Мой AI-тренер</span></div>
+      <div className="row between">
+        <IconBtn onClick={onBack} aria-label="Назад">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+        </IconBtn>
+        <span className="eyebrow">Мой AI-тренер</span>
+      </div>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 10, padding: "16px 0" }}>
         {msgs.map((m, i) => <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: m.role === "ai" ? "flex-start" : "flex-end", gap: 8 }}>
           <div className={`bubble ${m.role}`}>{m.text}</div>

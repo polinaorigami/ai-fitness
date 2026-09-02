@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Btn, Card } from "../components/UI";
+import { Btn, Card, Hero } from "../components/UI";
 import { api, User } from "../api";
 import { EQUIP } from "./Onboarding";
 import { BodyMap, ZoneKey, ZONE_LABELS } from "../components/BodyMap";
@@ -58,9 +58,14 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
   const Sw = ({ l, k }: { l: string; k: keyof User }) => <div className="toggle"><span>{l}</span><button className={`sw ${user[k] ? "on" : ""}`} onClick={() => toggle(k)} aria-label={l} /></div>;
   return (
     <div className="screen fade">
-      <div className="row" style={{ marginBottom: 8 }}>{user.photo_url && <img src={user.photo_url} style={{ width: 56, height: 56, borderRadius: 18 }} />}<div><h1 className="display" style={{ margin: 0, fontSize: 28 }}>{user.first_name}</h1>{user.username && <div style={{ color: "var(--muted)" }}>@{user.username}</div>}</div></div>
+      <Hero>
+        <div className="row" style={{ gap: 14 }}>
+          {user.photo_url && <img src={user.photo_url} style={{ width: 56, height: 56, borderRadius: 18, border: "2px solid rgba(255,255,255,.5)" }} />}
+          <div><h1 className="display" style={{ margin: 0, fontSize: 28 }}>{user.first_name}</h1>{user.username && <div style={{ opacity: .85 }}>@{user.username}</div>}</div>
+        </div>
+      </Hero>
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Профиль</div>
-      <Card><Row l="Цель" v={G[user.goal!]} /><Row l="Акцент" v={zoneLabel(user.focus_zone)} /><Row l="Возраст" v={user.age} /><Row l="Рост" v={user.height_cm && `${user.height_cm} см`} /><Row l="Вес" v={user.weight_kg && `${user.weight_kg} кг`} /><Row l="Тренировок в неделю" v={user.days_per_week} /><Row l="Опыт" v={L[user.level!]} /><Row l="Оборудование" v={<span style={{ fontSize: 13 }}>{user.equipment.map(eqLabel).join(", ")}</span>} />
+      <Card className="glass"><Row l="Цель" v={G[user.goal!]} /><Row l="Акцент" v={zoneLabel(user.focus_zone)} /><Row l="Возраст" v={user.age} /><Row l="Рост" v={user.height_cm && `${user.height_cm} см`} /><Row l="Вес" v={user.weight_kg && `${user.weight_kg} кг`} /><Row l="Тренировок в неделю" v={user.days_per_week} /><Row l="Опыт" v={L[user.level!]} /><Row l="Оборудование" v={<span style={{ fontSize: 13 }}>{user.equipment.map(eqLabel).join(", ")}</span>} />
         <div style={{ height: 16 }} />
         <div className="eyebrow" style={{ marginBottom: 10 }}>Акцент тренировок</div>
         <div style={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 16, padding: "16px 12px", marginBottom: 14 }}>
@@ -74,7 +79,7 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
         {zoneBusy && <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 10 }}>Пересобираем план…</div>}
         <Btn kind="ghost" onClick={onRedo}>Изменить анкету и пересобрать план</Btn></Card>
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Внешний вид</div>
-      <Card>
+      <Card className="glass">
         <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 10 }}>Тема</div>
         <div className="row" style={{ gap: 6, background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14, padding: 4, marginBottom: 16 }}>
           {([["system", "Система"], ["light", "Светлая"], ["dark", "Тёмная"]] as [ThemeMode, string][]).map(([m, l]) => (
@@ -93,7 +98,7 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
         </div>
       </Card>
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Нижнее меню</div>
-      <Card>
+      <Card className="glass">
         <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 12 }}>Переставь порядок стрелками или скрой лишнее</div>
         <div className="stack">
           {navOrder.map((id, i) => { const item = NAV_ITEMS.find(n => n.id === id)!; return (
@@ -115,7 +120,7 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
         </div>
       </Card>
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>AI-тренер</div>
-      <Card>
+      <Card className="glass">
         <div className="row between" style={{ cursor: "pointer" }} onClick={() => setShowCoachInfo(!showCoachInfo)}>
           <span style={{ fontWeight: 500 }}>Как работает AI-тренер</span><span style={{ color: "var(--muted)" }}>{showCoachInfo ? "▲" : "▼"}</span>
         </div>
@@ -127,17 +132,17 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
         <div className="eyebrow" style={{ margin: 0 }}>Достижения</div>
         {go && <button className="btn ghost sm" onClick={() => go("achievements")}>Смотреть все →</button>}
       </div>
-      <Card style={{ textAlign: "center", padding: 24 }}>
+      <Card className="glass" style={{ textAlign: "center", padding: 24 }}>
         <div style={{ fontSize: 28, marginBottom: 8 }}>🏅</div>
         <div style={{ fontWeight: 500, marginBottom: 4 }}>Твои медали</div>
         <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12 }}>Достигай целей и разблокируй новые достижения</div>
         {go && <Btn kind="accent" onClick={() => go("achievements")} style={{ width: "100%" }}>Открыть достижения</Btn>}
       </Card>
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Уведомления</div>
-      <Card><div className="toggle"><span>Время тренировки</span><input type="time" value={user.workout_time} onChange={e => time(e.target.value)} style={{ width: 120, padding: "8px 12px", fontSize: 16 }} /></div>
+      <Card className="glass"><div className="toggle"><span>Время тренировки</span><input type="time" value={user.workout_time} onChange={e => time(e.target.value)} style={{ width: 120, padding: "8px 12px", fontSize: 16 }} /></div>
         <Sw l="Напоминания о тренировках" k="remind_workout" /><Sw l="Напоминания об отдыхе" k="remind_rest" /><Sw l="Еженедельный отчёт" k="weekly_report" /><Sw l="Напоминания о прогрессе" k="remind_progress" /></Card>
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Обратная связь</div>
-      <Card>
+      <Card className="glass">
         <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 12 }}>Нравится приложение? Что улучшить?</div>
         <div className="row" style={{ gap: 10, marginBottom: 12 }}>
           <button className={`chip ${fbLiked === true ? "on" : ""}`} onClick={() => setFbLiked(fbLiked === true ? null : true)}>👍 Нравится</button>
@@ -149,7 +154,7 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
         <Btn kind="ghost" disabled={fbBusy || (fbLiked === null && !fbComment.trim())} onClick={sendFeedback}>{fbSent ? "Спасибо! ✓" : "Отправить"}</Btn>
       </Card>
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>О создателе</div>
-      <Card>
+      <Card className="glass">
         <div style={{ textAlign: "center" }}>
           <img src="/creator-qr.png" alt="QR-код" style={{ width: 140, height: 140, borderRadius: 16, marginBottom: 14 }} />
           <div style={{ fontWeight: 600, fontSize: 17, marginBottom: 4 }}>Полина</div>
@@ -158,7 +163,7 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
         </div>
       </Card>
       <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Данные</div>
-      <Card><div className="stack"><Btn kind="danger" disabled={!!busy} onClick={() => del("photos")}>Удалить фотографии</Btn><Btn kind="danger" disabled={!!busy} onClick={() => del("history")}>Удалить историю</Btn><Btn kind="danger" disabled={!!busy} onClick={() => del("account")}>Удалить аккаунт</Btn></div>
+      <Card className="glass"><div className="stack"><Btn kind="danger" disabled={!!busy} onClick={() => del("photos")}>Удалить фотографии</Btn><Btn kind="danger" disabled={!!busy} onClick={() => del("history")}>Удалить историю</Btn><Btn kind="danger" disabled={!!busy} onClick={() => del("account")}>Удалить аккаунт</Btn></div>
         <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 12 }}>Фото не используются для обучения моделей и не передаются сторонним сервисам.</div></Card>
     </div>
   );

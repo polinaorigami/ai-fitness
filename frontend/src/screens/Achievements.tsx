@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, Progress } from "../api";
-import { Card, Loading, Err, Stat } from "../components/UI";
+import { Card, Loading, Err, Stat, Hero } from "../components/UI";
 
 interface Achievement {
   id: string;
@@ -150,19 +150,15 @@ export default function Achievements() {
 
   return (
     <div className="screen fade">
-      <div style={{ marginBottom: 24 }}>
+      <Hero>
         <div className="eyebrow">ДОСТИЖЕНИЯ</div>
-        <h1 className="display" style={{ fontSize: 26, marginBottom: 4 }}>Твои медали 🏅</h1>
-        <div style={{ fontSize: 13, color: "var(--muted)" }}>
+        <h1 className="display" style={{ fontSize: 26, margin: "6px 0 4px" }}>Твои медали 🏅</h1>
+        <div style={{ opacity: .85, fontSize: 13, marginBottom: 16 }}>
           {unlockedCount} из {achievements.length}
         </div>
-      </div>
-
-      {/* Прогресс-бар */}
-      <Card style={{ marginBottom: 20 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ flex: 1 }}>
-            <div style={{ height: 8, background: "var(--surface)", borderRadius: 4, overflow: "hidden" }}>
+            <div style={{ height: 8, background: "rgba(255,255,255,.22)", borderRadius: 4, overflow: "hidden" }}>
               <div
                 style={{
                   height: "100%",
@@ -172,7 +168,7 @@ export default function Achievements() {
                 }}
               />
             </div>
-            <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
+            <div style={{ fontSize: 12, opacity: .85, marginTop: 4 }}>
               {unlockedCount} достижений разблокировано
             </div>
           </div>
@@ -180,7 +176,7 @@ export default function Achievements() {
             {Math.round((unlockedCount / achievements.length) * 100)}%
           </div>
         </div>
-      </Card>
+      </Hero>
 
       {/* Табы */}
       <div className="row" style={{ gap: 6, background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14, padding: 4, marginBottom: 16 }}>
@@ -230,7 +226,7 @@ export default function Achievements() {
                 cursor: "pointer",
                 transition: "all 0.2s ease",
               }}
-              className={a.unlocked ? "toggle" : ""}
+              className={`glass ${a.unlocked ? "toggle" : ""}`}
             >
               <div style={{ fontSize: 40, marginBottom: 8, display: "block", animation: a.unlocked ? "bounce 0.6s ease" : "none" }}>
                 {a.emoji}
@@ -268,7 +264,7 @@ export default function Achievements() {
       </div>
 
       {filtered.length === 0 && (
-        <Card style={{ textAlign: "center", padding: 32 }}>
+        <Card className="glass" style={{ textAlign: "center", padding: 32 }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
           <div style={{ color: "var(--muted)" }}>Здесь пока нет достижений</div>
           <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 8 }}>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Btn, Card } from "../components/UI";
+import { Btn, Card, Hero } from "../components/UI";
 
 interface MindSession {
   id: string;
@@ -323,7 +323,7 @@ export default function Mind() {
 
           {/* Подсказка дыхания (для breathing) */}
           {activeSession.type === "breathing" && (
-            <Card style={{ marginTop: 20, fontSize: 14, textAlign: "center", color: "var(--muted)" }}>
+            <Card className="glass" style={{ marginTop: 20, fontSize: 14, textAlign: "center", color: "var(--muted)" }}>
               {activeSession.id === "breathing-478" && "Вдох (4) → Задержка (7) → Выдох (8)"}
               {activeSession.id === "breathing-box" && "Вдох (4) → Выдох (4) → Вдох (4) → Выдох (4)"}
             </Card>
@@ -336,15 +336,9 @@ export default function Mind() {
   // Главный экран Mind
   return (
     <div className="screen fade">
-      <div className="row between" style={{ marginBottom: 12 }}>
-        <div>
-          <div className="eyebrow">MIND</div>
-          <h1 className="display" style={{ fontSize: 26 }}>Отдохни 🧘</h1>
-        </div>
-      </div>
-
-      {/* Совет дня */}
-      <Card accent style={{ marginBottom: 18 }}>
+      <Hero>
+        <div className="eyebrow">MIND</div>
+        <h1 className="display" style={{ fontSize: 26, margin: "6px 0 16px" }}>Отдохни 🧘</h1>
         <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
           <div style={{ fontSize: 28 }}>✨</div>
           <div>
@@ -354,7 +348,7 @@ export default function Mind() {
             </div>
           </div>
         </div>
-      </Card>
+      </Hero>
 
       {/* Вкладки */}
       <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
@@ -381,7 +375,7 @@ export default function Mind() {
         {BUILTIN_SESSIONS.map(session => (
           <Card
             key={session.id}
-            className="toggle"
+            className="toggle glass"
             style={{
               display: "flex",
               justifyContent: "space-between",
@@ -413,6 +407,7 @@ export default function Mind() {
               .map(session => (
                 <Card
                   key={session.id}
+                  className="glass"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -475,7 +470,7 @@ export default function Mind() {
 
       {/* Статистика */}
       <div className="eyebrow" style={{ margin: "12px 0 10px" }}>Твой прогресс</div>
-      <Card>
+      <Card className="glass">
         <div className="toggle">
           <span>Сегодня практиковал(а)</span>
           <span style={{ fontWeight: 600 }}>{stats.todayMinutes} мин</span>

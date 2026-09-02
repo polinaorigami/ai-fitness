@@ -9,7 +9,7 @@ export default function Schedule({ program, todayIndex, onStart, onBack }: { pro
       {program.week.map((d, i) => (
         <Card
           key={i}
-          className={i === todayIndex ? "" : ""}
+          className="glass"
           style={{
             animation: `slideInUp 0.4s ease ${i * 0.08}s both`,
             background: i === todayIndex ? "linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, var(--card)), var(--card))" : undefined,

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Btn, Err } from "../components/UI";
+import { Btn, Err, Hero } from "../components/UI";
 import { api } from "../api";
 import { haptic } from "../tg";
 
@@ -86,7 +86,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
         <span className="eyebrow">Шаг {s} из {TOTAL}</span>
       </div>
       <div className="progressbar" style={{ marginBottom: 24 }}><i style={{ width: `${(s / TOTAL) * 100}%` }} /></div>
-      {steps[s]}
+      {s === 1 ? <Hero>{steps[s]}</Hero> : steps[s]}
     </div>
   );
 }

@@ -21,13 +21,13 @@ export default function Analysis({ onDone }: { onDone: () => void }) {
       <h1 className="display">ТВОЯ СТРАТЕГИЯ ГОТОВА</h1>
       {s.summary && <p className="sub">{s.summary}</p>}
       <div className="grid2">
-        <Card><div className="eyebrow">Цель</div><div className="mid" style={{ marginTop: 8 }}>{s.goal_label}</div></Card>
-        <Card><div className="eyebrow">Тренировки</div><div className="big" style={{ marginTop: 8 }}>{s.days}</div><div style={{ color: "var(--muted)", fontSize: 13 }}>раза в неделю</div></Card>
+        <Card className="glass"><div className="eyebrow">Цель</div><div className="mid" style={{ marginTop: 8 }}>{s.goal_label}</div></Card>
+        <Card className="glass"><div className="eyebrow">Тренировки</div><div className="big" style={{ marginTop: 8 }}>{s.days}</div><div style={{ color: "var(--muted)", fontSize: 13 }}>раза в неделю</div></Card>
       </div>
-      <Card><div className="eyebrow">Основной акцент</div><div className="chips" style={{ marginTop: 10 }}>{s.focus.map(f => <span key={f} className="chip on">{f}</span>)}</div></Card>
-      <Card><div className="eyebrow">Средняя продолжительность</div><div className="big" style={{ marginTop: 8 }}>{s.avg_minutes}<span style={{ fontSize: 20, marginLeft: 6 }}>мин</span></div></Card>
-      <Card><div className="eyebrow">Прогрессия</div><div style={{ marginTop: 8, fontSize: 15 }}>{s.progression}</div></Card>
-      {goal ? <Card><div className="eyebrow">Твоя цель</div><div className="mid" style={{ margin: "10px 0" }}>Через 12 недель: {s.days} тренировки в неделю, стабильная техника и рост рабочих весов по каждому упражнению.</div><div style={{ fontSize: 12, color: "var(--muted)" }}>Это мотивационная визуализация, а не гарантированный прогноз результата.</div></Card>
+      <Card className="glass"><div className="eyebrow">Основной акцент</div><div className="chips" style={{ marginTop: 10 }}>{s.focus.map(f => <span key={f} className="chip on">{f}</span>)}</div></Card>
+      <Card className="glass"><div className="eyebrow">Средняя продолжительность</div><div className="big" style={{ marginTop: 8 }}>{s.avg_minutes}<span style={{ fontSize: 20, marginLeft: 6 }}>мин</span></div></Card>
+      <Card className="glass"><div className="eyebrow">Прогрессия</div><div style={{ marginTop: 8, fontSize: 15 }}>{s.progression}</div></Card>
+      {goal ? <Card className="glass"><div className="eyebrow">Твоя цель</div><div className="mid" style={{ margin: "10px 0" }}>Через 12 недель: {s.days} тренировки в неделю, стабильная техника и рост рабочих весов по каждому упражнению.</div><div style={{ fontSize: 12, color: "var(--muted)" }}>Это мотивационная визуализация, а не гарантированный прогноз результата.</div></Card>
         : <Btn kind="ghost" onClick={() => setGoal(true)}>Показать мою цель</Btn>}
       <div style={{ height: 12 }} />
       <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 12, textAlign: "center" }}>AI не ставит диагнозы и не обещает конкретный результат. При боли или травме обратись к врачу.</div>

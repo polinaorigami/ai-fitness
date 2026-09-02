@@ -7,6 +7,13 @@ export const Card = ({ children, accent, className = "", style, onClick }: { chi
   <div className={`card ${accent ? "accent" : ""} ${className}`} style={style} onClick={onClick}>{children}</div>
 );
 export const Stat = ({ v, l, style }: { v: ReactNode; l: string; style?: CSSProperties }) => <div className="stat" style={style}><div className="v">{v}</div><div className="l">{l}</div></div>;
+export const IconBtn = ({ children, onClick, onHero, className = "", style, "aria-label": ariaLabel }: { children: ReactNode; onClick?: () => void; onHero?: boolean; className?: string; style?: CSSProperties; "aria-label"?: string }) => (
+  <button className={`icon-btn ${onHero ? "on-hero" : ""} ${className}`} style={style} aria-label={ariaLabel} onClick={() => { haptic(); onClick?.(); }}>{children}</button>
+);
+// Баннер-«герой»: фон читает --hero-img (устанавливается через img), иначе — градиент-заглушка (--card фото ещё нет).
+export const Hero = ({ children, img, className = "", style }: { children: ReactNode; img?: string; className?: string; style?: CSSProperties }) => (
+  <div className={`hero ${className}`} style={{ ...(img ? { "--hero-img": `url(${img})` } as CSSProperties : {}), ...style }}>{children}</div>
+);
 const ICONS: Record<string, ReactNode> = {
   home: <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l9-8 9 8" /><path d="M5 10v10h14V10" /></svg>,
   workout: <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6.5 6.5l11 11" /><path d="M4 8l2.5-2.5L9 8l-2.5 2.5z" /><path d="M15 15l2.5-2.5L20 15l-2.5 2.5z" /><path d="M4 4l2 2M18 18l2 2" /></svg>,

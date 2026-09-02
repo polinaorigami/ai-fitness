@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Btn, Card, Loading, Err, fmtMin } from "../components/UI";
+import { Btn, Card, Hero, IconBtn, Loading, Err, fmtMin } from "../components/UI";
 import { api, User, FriendsData, FriendInviteT, FriendMsg, FriendBrief, RecentSession } from "../api";
 import { haptic, notify } from "../tg";
 
@@ -113,8 +113,10 @@ export default function Friends({ user }: { user: User }) {
 
   return (
     <div className="screen fade">
-      <div className="eyebrow">ДРУЗЬЯ</div>
-      <h1 className="display" style={{ fontSize: 26, marginBottom: 16 }}>Твоя сеть</h1>
+      <Hero>
+        <div className="eyebrow">ДРУЗЬЯ</div>
+        <h1 className="display" style={{ fontSize: 26, margin: "6px 0 0" }}>Твоя сеть</h1>
+      </Hero>
 
       {/* Мой код */}
       <Card accent>
@@ -141,7 +143,7 @@ export default function Friends({ user }: { user: User }) {
         friends.length > 0 ? (
           <>
             {friends.map(f => (
-              <Card key={f.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 12, marginBottom: 10, gap: 10 }}>
+              <Card key={f.id} className="glass" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 12, marginBottom: 10, gap: 10 }}>
                 <div className="row" style={{ gap: 12, minWidth: 0, flex: 1 }}>
                   <Avatar f={f} size={44} />
                   <div style={{ minWidth: 0, flex: 1 }}>
@@ -168,7 +170,7 @@ export default function Friends({ user }: { user: User }) {
             <Btn kind="accent" onClick={() => setShowAdd(true)} style={{ width: "100%", marginTop: 6 }}>Добавить друга</Btn>
           </>
         ) : (
-          <Card style={{ textAlign: "center", padding: "36px 24px" }}>
+          <Card className="glass" style={{ textAlign: "center", padding: "36px 24px" }}>
             <div style={{ width: 56, height: 56, borderRadius: 18, background: "var(--accent-soft)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
               <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>
             </div>
@@ -182,7 +184,7 @@ export default function Friends({ user }: { user: User }) {
       {tab === "invites" && (
         <>
           {incoming.length === 0 && outgoing.length === 0 && (
-            <Card style={{ textAlign: "center", padding: "36px 24px" }}>
+            <Card className="glass" style={{ textAlign: "center", padding: "36px 24px" }}>
               <div style={{ width: 56, height: 56, borderRadius: 18, background: "var(--surface)", color: "var(--muted)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
                 <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16v12H4z" /><path d="M4 7l8 6 8-6" /></svg>
               </div>
@@ -192,7 +194,7 @@ export default function Friends({ user }: { user: User }) {
           )}
           {incoming.length > 0 && <div className="eyebrow" style={{ marginBottom: 10 }}>Входящие</div>}
           {incoming.map(i => (
-            <Card key={i.invite_id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 12, marginBottom: 10 }}>
+            <Card key={i.invite_id} className="glass" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 12, marginBottom: 10 }}>
               <div className="row" style={{ gap: 12 }}>
                 <Avatar f={i.user} size={44} />
                 <div>
@@ -208,7 +210,7 @@ export default function Friends({ user }: { user: User }) {
           ))}
           {outgoing.length > 0 && <div className="eyebrow" style={{ margin: "16px 0 10px" }}>Отправленные</div>}
           {outgoing.map(i => (
-            <Card key={i.invite_id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 12, marginBottom: 10 }}>
+            <Card key={i.invite_id} className="glass" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 12, marginBottom: 10 }}>
               <div className="row" style={{ gap: 12 }}>
                 <Avatar f={i.user} size={44} />
                 <div>
@@ -337,7 +339,9 @@ function Chat({ friend, onBack }: { friend: FriendBrief; onBack: () => void }) {
       {/* paddingRight резервирует место под глобальный плеер (MusicWidget), который по умолчанию
           сидит в правом верхнем углу — иначе имя друга уходит под него и обрезается. */}
       <div className="row between" style={{ marginBottom: 8, paddingRight: 64 }}>
-        <button className="btn ghost sm" onClick={onBack}>Назад</button>
+        <IconBtn onClick={onBack} aria-label="Назад">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+        </IconBtn>
         <div className="row" style={{ gap: 8, minWidth: 0 }}>
           <span style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 130 }}>{friend.first_name}</span>
           <Avatar f={friend} size={32} />
@@ -363,11 +367,10 @@ function Chat({ friend, onBack }: { friend: FriendBrief; onBack: () => void }) {
           на Android при появлении клавиатуры sticky-элемент внутри flex-колонки может
           "уехать" за пределы видимой (сжатой клавиатурой) области. fixed относительно
           viewport работает предсказуемо и здесь уже проверено на .nav. */}
-      <div className="row" style={{ position: "fixed", left: 0, right: 0, bottom: 0, maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderTop: "1px solid var(--line)", padding: "10px 18px calc(10px + var(--safe-b))", gap: 8, zIndex: 60 }}>
-        <button onClick={openShare} aria-label="Поделиться тренировкой"
-          style={{ flexShrink: 0, width: 52, height: 52, borderRadius: 14, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div className="row" style={{ position: "fixed", left: 0, right: 0, bottom: 0, maxWidth: 480, margin: "0 auto", background: "var(--glass-bg)", WebkitBackdropFilter: "blur(var(--glass-blur))", backdropFilter: "blur(var(--glass-blur))", borderTop: "1px solid var(--glass-border)", padding: "10px 18px calc(10px + var(--safe-b))", gap: 8, zIndex: 60 }}>
+        <IconBtn onClick={openShare} aria-label="Поделиться тренировкой" style={{ width: 52, height: 52 }}>
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6.5 6.5l11 11" /><path d="M4 8l2.5-2.5L9 8l-2.5 2.5z" /><path d="M15 15l2.5-2.5L20 15l-2.5 2.5z" /><path d="M4 4l2 2M18 18l2 2" /></svg>
-        </button>
+        </IconBtn>
         <input placeholder="Сообщение…" value={text} onChange={e => setText(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
           style={{ flex: 1, minWidth: 0 }} />
         <button className="btn accent sm" style={{ height: 52, width: 52 }} onClick={send} disabled={sending || !text.trim()}>→</button>

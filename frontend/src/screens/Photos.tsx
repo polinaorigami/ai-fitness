@@ -20,7 +20,7 @@ export default function Photos({ onDone }: { onDone: () => void }) {
       <div className="eyebrow">Шаг 9</div>
       <h1 className="display">СОЗДАЙ СВОЙ ПРОФИЛЬ</h1>
       <p className="sub">Загрузи фотографию, чтобы AI мог персонализировать тренировочную стратегию.</p>
-      <div className="card">
+      <div className="card glass">
         <div className="eyebrow" style={{ marginBottom: 10 }}>Для лучшего анализа</div>
         <div className="stack" style={{ fontSize: 15 }}><div>• полный рост</div><div>• хорошее освещение</div><div>• нейтральная поза</div><div>• камера примерно на уровне тела</div></div>
         <div style={{ marginTop: 12, fontSize: 13, color: "var(--muted)" }}>Рекомендуется: спереди, сбоку, сзади. Минимум — одна фотография.</div>
