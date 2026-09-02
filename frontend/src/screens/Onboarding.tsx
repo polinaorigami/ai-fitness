@@ -10,11 +10,11 @@ const DAYS = [2, 3, 4, 5, 6];
 const LOC = [["gym", "🏋️", "В тренажёрном зале"], ["home", "🏠", "Дома"], ["both", "🔄", "И дома, и в зале"]];
 const LVL = [["beginner", "Новичок", "Меньше года регулярных тренировок"], ["intermediate", "Средний", "1–3 года"], ["advanced", "Продвинутый", "Больше 3 лет"]];
 export const EQUIP = [["machine", "Тренажёры"], ["dumbbell", "Гантели"], ["barbell", "Штанга"], ["kettlebell", "Гири"], ["band", "Резинки"], ["pullup_bar", "Турник"], ["mat", "Коврик"], ["bodyweight", "Собственный вес"], ["bench", "Скамья"], ["jump_rope", "Скакалка"]];
-const TOTAL = 8;
+const TOTAL = 9;
 
-// Акцентная зона отдельным шагом анкеты не собирается (её нет в новом коротком
-// онбординге, но она остаётся доступной и редактируемой позже в Профиле) —
-// берём безопасное значение по умолчанию, как и раньше.
+// Акцентная зона теперь спрашивается отдельным шагом (см. шаг 8 ниже) и
+// остаётся редактируемой позже в Профиле. DEFAULT_FOCUS_ZONE — подстраховка
+// на случай, если черновик анкеты был сохранён до этого шага (см. loadDraft).
 const DEFAULT_FOCUS_ZONE = "full";
 
 const DRAFT_KEY = "aifitness_onboarding_draft";
@@ -75,7 +75,8 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           <input className="range" type="range" min={20} max={75} step={5} value={d.minutes} onChange={e => set("minutes", +e.target.value)} />
         </div>
         <Btn onClick={() => goStep(8)}>Дальше</Btn></div></>,
-    8: <><h1 className="display">Сколько раз в неделю ты можешь тренироваться?</h1>{err && <Err e={err} />}<div style={{ height: err ? 12 : 0 }} /><div className="stack">{DAYS.map(n => <Opt key={n} on={d.days_per_week === n} onClick={() => pickAndFinish(n)}>{busy && d.days_per_week === n ? "Сохраняем…" : `${n} ${n < 5 ? "раза" : "раз"}`}</Opt>)}</div></>,
+    8: <><h1 className="display">Куда сделать акцент?</h1><p className="sub">Программа будет чуть чаще нагружать выбранную зону. Можно поменять позже в Профиле.</p><div className="stack">{ZONES.map(([k, ic, l]) => <Opt key={k} on={d.focus_zone === k} ic={ic} onClick={() => pick("focus_zone", k)}>{l}</Opt>)}</div></>,
+    9: <><h1 className="display">Сколько раз в неделю ты можешь тренироваться?</h1>{err && <Err e={err} />}<div style={{ height: err ? 12 : 0 }} /><div className="stack">{DAYS.map(n => <Opt key={n} on={d.days_per_week === n} onClick={() => pickAndFinish(n)}>{busy && d.days_per_week === n ? "Сохраняем…" : `${n} ${n < 5 ? "раза" : "раз"}`}</Opt>)}</div></>,
   };
 
   return (

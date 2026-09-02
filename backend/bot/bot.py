@@ -9,10 +9,19 @@ from sqlalchemy import select
 from app.config import BOT_TOKEN, WEBAPP_URL
 from app.db import SessionLocal
 from app.models import User, Program, WorkoutSession
+from app.program_generator import generate
+from app.ai.provider import get_provider
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(BOT_TOKEN); dp = Dispatcher()
+ai = get_provider()
 open_kb = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="ОТКРЫТЬ ПРИЛОЖЕНИЕ", web_app=WebAppInfo(url=WEBAPP_URL))]])
+
+# Те же ключи/подписи, что и в анкете (frontend/src/screens/Onboarding.tsx, ZONES) —
+# держим в синхроне, если там меняется набор зон.
+ZONES_BOT = [("full", "🧘", "Без акцента — всё тело"), ("glutes", "🍑", "Ягодицы"), ("legs", "🦵", "Ноги"),
+             ("abs", "🔥", "Пресс"), ("back", "🦅", "Спина"), ("chest", "💪", "Грудь"), ("arms", "💪", "Руки")]
+ZONE_LABEL_BY_KEY = {k: l for k, _ic, l in ZONES_BOT}
 
 @dp.message(CommandStart())
 async def start(m: Message):
@@ -40,12 +49,37 @@ async def move(c: CallbackQuery):
 async def keep(c: CallbackQuery):
     await c.message.edit_text("Расписание без изменений 👍"); await c.answer()
 
+@dp.callback_query(F.data.startswith("zone:"))
+async def pick_zone(c: CallbackQuery):
+    zone = c.data.split(":", 1)[1]
+    with SessionLocal() as db:
+        u = db.get(User, c.from_user.id)
+        if not u:
+            await c.answer(); return
+        u.focus_zone = zone
+        if u.onboarded:
+            # как и при смене акцента в Профиле — переgenerate-им программу под новую зону
+            for p in db.scalars(select(Program).where(Program.user_id == u.id, Program.active == True)): p.active = False
+            data = await ai.analyze_strategy(u, generate(u))
+            db.add(Program(user_id=u.id, strategy=data["strategy"], week=data["week"]))
+        db.commit()
+    await c.message.edit_text(f"Готово — теперь акцент на «{ZONE_LABEL_BY_KEY.get(zone, zone)}» 🎯\nПрограмма обновлена.")
+    await c.answer()
+
 async def tick():
     """Каждую минуту: кому пора напомнить (локальное время пользователя == workout_time)."""
     now = datetime.utcnow()
     with SessionLocal() as db:
         for u in db.scalars(select(User).where(User.onboarded==True)):
             local = now + timedelta(minutes=u.timezone_offset)
+            hhmm0 = local.strftime("%H:%M")
+            # раз в месяц (1-е число, 19:00 локального) спрашиваем, не сменить ли акцентную зону —
+            # она есть в Профиле, но там про неё никто не напоминает
+            if u.remind_progress and local.day == 1 and hhmm0 == "19:00":
+                try:
+                    await bot.send_message(u.id, "🎯 На что хочешь сделать акцент в этом месяце?",
+                        reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text=f"{ic} {l}", callback_data=f"zone:{k}")] for k, ic, l in ZONES_BOT]))
+                except Exception as e: logging.warning(e)
             p = db.scalar(select(Program).where(Program.user_id==u.id, Program.active==True).order_by(Program.id.desc()))
             if not p: continue
             day = p.week[local.weekday()]
