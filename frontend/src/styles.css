@@ -55,8 +55,14 @@ html,body,.card,.btn,.stat,.option,.chip,.nav{transition:background-color .28s e
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 button,input,textarea{font:inherit;color:inherit}
-input,textarea{border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;background:var(--card);width:100%;outline:none;font-size:16px;transition:border-color .18s}
+/* -webkit-appearance/appearance:none — критично для Android WebView (Telegram на Android):
+   без этого некоторые версии форсируют системную тёмную тему поверх наших цветов на
+   нестилизованных нативных полях ввода — поле рендерится чёрным прямоугольником без
+   текста, хотя background/color в CSS заданы верно. color-scheme на самом элементе (не
+   только на :root) дополнительно подсказывает движку не переопределять наши цвета. */
+input,textarea{-webkit-appearance:none;appearance:none;border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;background:var(--card);color:var(--ink);width:100%;outline:none;font-size:16px;transition:border-color .18s}
 input:focus,textarea:focus{border-color:var(--accent)}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
 .screen{min-height:100vh;padding:calc(18px + var(--safe-t)) 18px calc(100px + var(--safe-b));max-width:480px;margin:0 auto}
 .screen.no-nav{padding-bottom:calc(24px + var(--safe-b))}
 /* Типографика: характер задаётся размером/весом/spacing, а не отдельным шрифтом */
