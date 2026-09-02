@@ -163,10 +163,16 @@ h1.display{font-size:30px;margin:6px 0 10px}
 .icon-btn{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--glass-bg);border:1px solid var(--glass-border);-webkit-backdrop-filter:blur(var(--glass-blur));backdrop-filter:blur(var(--glass-blur));color:var(--ink);cursor:pointer;transition:transform .08s,opacity .15s}
 .icon-btn:active{transform:scale(.92)}
 .icon-btn.on-hero{color:#fff;background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.28)}
+/* Кнопка-стекло поверх фото (герой) — всегда белая полупрозрачная, вне зависимости от темы
+   приложения, как .icon-btn.on-hero: тёмная/светлая тема тут ни при чём, под ногами всегда фото. */
+.btn.glass{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.28);-webkit-backdrop-filter:blur(var(--glass-blur));backdrop-filter:blur(var(--glass-blur));box-shadow:none}
 /* Заглушка-градиент фиксированная (не var(--ink)/var(--bg-2)) — те токены в светлой теме почти
-   белые, а герой всегда тёмный с белым текстом поверх фото, независимо от темы приложения. */
-.hero{position:relative;overflow:hidden;border-radius:var(--r-lg);color:#fff;padding:22px;isolation:isolate;background:var(--hero-img, linear-gradient(135deg,#2A2A32,#0B0B0D)) center/cover no-repeat;margin-bottom:14px}
-.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.32) 0%,rgba(0,0,0,.30) 55%,rgba(0,0,0,.78) 100%);z-index:0}
+   белые, а герой всегда тёмный с белым текстом поверх фото, независимо от темы приложения.
+   min-height — чтобы фото на фоне читалось как полноценная картинка, а не узкая полоска под
+   текстом; скрим ослаблен сверху/по центру (фото должно быть видно), плотнее только снизу,
+   где обычно лежат кнопки — тексту и кнопкам всё ещё нужен контраст. */
+.hero{position:relative;overflow:hidden;border-radius:var(--r-lg);color:#fff;padding:22px;isolation:isolate;min-height:300px;display:flex;flex-direction:column;background:var(--hero-img, linear-gradient(135deg,#2A2A32,#0B0B0D)) center/cover no-repeat;margin-bottom:14px}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.10) 38%,rgba(0,0,0,.68) 100%);z-index:0}
 .hero>*{position:relative;z-index:1}
 .hero .eyebrow{color:rgba(255,255,255,.78)}
 .hero .sub{color:rgba(255,255,255,.85)}

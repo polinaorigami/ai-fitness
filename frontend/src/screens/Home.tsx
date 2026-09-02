@@ -55,7 +55,7 @@ export default function Home({ user, today, program, onStart, onDuration, go, qu
             <div className="big" style={{ margin: "10px 0" }}>ОТДЫХ</div>
             <div style={{ opacity: .85 }}>Восстановление — часть плана. {today.next && <>Следующая: {today.next.weekday.toLowerCase()}, {today.next.title.toLowerCase()}.</>}</div>
             <div style={{ height: 16 }} />
-            {today.next && <Btn kind="ghost" onClick={() => onStart(today.next!.day_index)}>Тренироваться сегодня</Btn>}
+            {today.next && <Btn kind="glass" onClick={() => onStart(today.next!.day_index)}>Тренироваться сегодня</Btn>}
           </>
         ) : today.done_today ? (
           <>
@@ -66,9 +66,9 @@ export default function Home({ user, today, program, onStart, onDuration, go, qu
           <>
             <div className="big" style={{ margin: "10px 0", fontSize: 40 }}>{d.title.toUpperCase()}</div>
             <div className="row" style={{ gap: 20, marginBottom: 20 }}><div><div className="mid">{d.exercises.length}</div><div style={{ fontSize: 13, opacity: .8 }}>упражнений</div></div><div><div className="mid">~{today.estimated_minutes}</div><div style={{ fontSize: 13, opacity: .8 }}>минут</div></div></div>
-            <Btn kind="ghost" onClick={() => onStart(today.day_index)}>Начать тренировку</Btn>
+            <Btn kind="glass" onClick={() => onStart(today.day_index)}>Начать тренировку</Btn>
             <div style={{ height: 10 }} />
-            <Btn kind="ghost" onClick={() => setShowTime(true)}>Подобрать по времени</Btn>
+            <Btn kind="glass" onClick={() => setShowTime(true)}>Подобрать по времени</Btn>
           </>
         )}
       </Hero>
