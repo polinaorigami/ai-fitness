@@ -229,7 +229,7 @@ export default function Friends({ user }: { user: User }) {
       {/* Добавить друга — bottom sheet */}
       {showAdd && (
         <div onClick={() => setShowAdd(false)} className="sheet-overlay">
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderRadius: "20px 20px 0 0", padding: 24, paddingBottom: "calc(24px + var(--safe-b))", animation: "rise .3s ease" }}>
+          <div onClick={e => e.stopPropagation()} className="sheet-card" style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderRadius: "20px 20px 0 0", padding: 24, paddingBottom: "calc(24px + var(--safe-b))", animation: "rise .3s ease" }}>
             <div style={{ textAlign: "center", marginBottom: 18 }}>
               <h2 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 700 }}>Добавить друга</h2>
               <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>Введи код приглашения друга</p>
@@ -380,7 +380,7 @@ function Chat({ friend, onBack }: { friend: FriendBrief; onBack: () => void }) {
       {/* Поделиться тренировкой — bottom sheet */}
       {showShare && (
         <div onClick={() => setShowShare(false)} className="sheet-overlay">
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderRadius: "20px 20px 0 0", padding: 24, paddingBottom: "calc(24px + var(--safe-b))", maxHeight: "70vh", overflowY: "auto", animation: "rise .3s ease" }}>
+          <div onClick={e => e.stopPropagation()} className="sheet-card" style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderRadius: "20px 20px 0 0", padding: 24, paddingBottom: "calc(24px + var(--safe-b))", maxHeight: "70vh", overflowY: "auto", animation: "rise .3s ease" }}>
             <div style={{ textAlign: "center", marginBottom: 18 }}>
               <h2 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 700 }}>Поделиться тренировкой</h2>
               <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>Выбери завершённую тренировку</p>

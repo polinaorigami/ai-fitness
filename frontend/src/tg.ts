@@ -39,7 +39,9 @@ export function setMode(m: ThemeMode) {
 // Реальная видимая высота (visualViewport), не layout-высота: на Android при появлении
 // клавиатуры layout-viewport не меняется, а fixed-элементы (нижние шторки/модалки) продолжают
 // позиционироваться по нему — из-за этого низ шторки уезжает под клавиатуру. CSS-переменная
-// --vvh даёт актуальную высоту, которую используют такие оверлеи (.sheet-overlay) вместо 100vh.
+// --vvh даёт актуальную высоту; карточки шторок (.sheet-card) сдвигаются по ней вверх при открытой
+// клавиатуре, а сама подложка (.sheet-overlay) всегда занимает inset:0 (весь реальный экран), чтобы
+// нижняя навигация никогда не "просвечивала" снизу, даже если --vvh на какой-то момент устарела.
 function setVvh() {
   const h = window.visualViewport?.height ?? window.innerHeight;
   document.documentElement.style.setProperty("--vvh", `${h}px`);

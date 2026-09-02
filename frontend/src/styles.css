@@ -176,6 +176,12 @@ h1.display{font-size:30px;margin:6px 0 10px}
 .hero>*{position:relative;z-index:1}
 .hero .eyebrow{color:rgba(255,255,255,.78)}
 .hero .sub{color:rgba(255,255,255,.85)}
-/* Оверлей нижних шторок (bottom sheet): высота — по видимому visualViewport (--vvh, см. tg.ts),
-   а не 100vh/inset:0 — иначе на Android шторка с полем ввода уезжает под открывшуюся клавиатуру. */
-.sheet-overlay{position:fixed;left:0;right:0;top:0;height:var(--vvh, 100vh);display:flex;align-items:flex-end;background:var(--sheet-scrim);z-index:100}
+/* Оверлей нижних шторок (bottom sheet): всегда inset:0 (весь реальный экран), поэтому затемнение
+   и z-index:100 гарантированно перекрывают нижнюю навигацию и плашку музыки при любых значениях
+   --vvh — раньше здесь была height:var(--vvh), и если --vvh оказывался меньше реальной высоты
+   экрана (например, --vvh не успевал сброситься обратно после закрытия клавиатуры), под шторкой
+   оставалась незакрытая полоса, в которой навигация "просвечивала" поверх шторки.
+   Саму карточку шторки поднимаем над клавиатурой отдельно классом .sheet-card (translateY по --vvh),
+   не трогая размер/позицию оверлея-подложки. */
+.sheet-overlay{position:fixed;inset:0;display:flex;align-items:flex-end;background:var(--sheet-scrim);z-index:100}
+.sheet-card{transform:translateY(calc(var(--vvh, 100vh) - 100vh));transition:transform .15s ease}
