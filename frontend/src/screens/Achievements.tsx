@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, Progress } from "../api";
 import { Card, Loading, Err, Stat, Hero } from "../components/UI";
+import achievementsHero from "../assets/hero/achievements.webp";
 
 interface Achievement {
   id: string;
@@ -150,7 +151,7 @@ export default function Achievements() {
 
   return (
     <div className="screen fade">
-      <Hero>
+      <Hero img={achievementsHero}>
         <div className="eyebrow">ДОСТИЖЕНИЯ</div>
         <h1 className="display" style={{ fontSize: 26, margin: "6px 0 4px" }}>Твои медали 🏅</h1>
         <div style={{ opacity: .85, fontSize: 13, marginBottom: 16 }}>

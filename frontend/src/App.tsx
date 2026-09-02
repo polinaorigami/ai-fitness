@@ -4,6 +4,7 @@ import { initTelegram, tzOffset } from "./tg";
 import { initTheme } from "./theme";
 import { Nav, Loading, Btn, Err } from "./components/UI";
 import { NAV_ITEMS, NavId, getNavOrder } from "./navPrefs";
+import { QuickActionId, getQuickActions } from "./quickActionsPrefs";
 import MusicWidget from "./musicWidget";
 import Tour, { tourSeen } from "./tour";
 import Welcome from "./screens/Welcome"; import Onboarding from "./screens/Onboarding"; import Photos from "./screens/Photos"; import Analysis from "./screens/Analysis";
@@ -21,6 +22,7 @@ export default function App() {
   const [wk, setWk] = useState<{ day: Day; index: number } | null>(null);
   const [err, setErr] = useState("");
   const [navOrder, setNavOrderState] = useState<NavId[]>(getNavOrder());
+  const [quickActions, setQuickActionsState] = useState<QuickActionId[]>(getQuickActions());
   const [showTour, setShowTour] = useState(false);
   const [whatsNew, setWhatsNew] = useState<WhatsNewData | null>(null);
 
@@ -80,13 +82,13 @@ export default function App() {
   if (!program || !today) return <Loading />;
   return (<>
     <MusicWidget />
-    {screen === "home" && <Home user={user} today={today} program={program} onStart={startWorkout} onShort={startShort} onDuration={startDuration} go={go} />}
+    {screen === "home" && <Home user={user} today={today} program={program} onStart={startWorkout} onShort={startShort} onDuration={startDuration} go={go} quickActions={quickActions} />}
     {screen === "schedule" && <Schedule program={program} todayIndex={today.day_index} onStart={startWorkout} onBack={() => setScreen("home")} />}
     {screen === "progress" && <Progress />}
     {screen === "friends" && <Friends user={user} />}
     {screen === "mind" && <Mind />}
     {screen === "achievements" && <Achievements />}
-    {screen === "profile" && <Profile user={user} setUser={setUser} onRedo={() => { clearSession(); setScreen("onboarding"); }} onLogout={() => location.reload()} navOrder={navOrder} onNavChange={setNavOrderState} go={go} />}
+    {screen === "profile" && <Profile user={user} setUser={setUser} onRedo={() => { clearSession(); setScreen("onboarding"); }} onLogout={() => location.reload()} navOrder={navOrder} onNavChange={setNavOrderState} quickActions={quickActions} onQuickActionsChange={setQuickActionsState} go={go} />}
     <Nav tab={tab} go={go} items={navItems} />
     {showTour && <Tour onClose={() => setShowTour(false)} />}
   </>);

@@ -6,11 +6,13 @@ import { BodyMap, ZoneKey, ZONE_LABELS } from "../components/BodyMap";
 import { THEME_PRESETS, getTheme, setTheme } from "../theme";
 import { openLink, getMode, setMode, ThemeMode } from "../tg";
 import { NAV_ITEMS, NavId, setNavOrder as saveNavOrder } from "../navPrefs";
+import { QUICK_ACTION_ITEMS, QuickActionId, setQuickActions as saveQuickActions } from "../quickActionsPrefs";
+import profileHero from "../assets/hero/profile.webp";
 import { clearSession } from "./Workout";
 const CREATOR_LINK = "https://polinapeiv.taplink.ws";
 const G: Record<string, string> = { weight_loss: "Снижение веса", muscle: "Набор мышц", recomp: "Рекомпозиция тела", strength: "Стать сильнее", fitness: "Улучшить физическую форму", endurance: "Развить выносливость" };
 const L: Record<string, string> = { beginner: "Новичок", intermediate: "Средний", advanced: "Продвинутый" };
-export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onNavChange, go }: { user: User; setUser: (u: User) => void; onRedo: () => void; onLogout: () => void; navOrder: NavId[]; onNavChange: (ids: NavId[]) => void; go?: (t: string) => void }) {
+export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onNavChange, quickActions, onQuickActionsChange, go }: { user: User; setUser: (u: User) => void; onRedo: () => void; onLogout: () => void; navOrder: NavId[]; onNavChange: (ids: NavId[]) => void; quickActions: QuickActionId[]; onQuickActionsChange: (ids: QuickActionId[]) => void; go?: (t: string) => void }) {
   const [busy, setBusy] = useState(""); const eqLabel = (k: string) => EQUIP.find(e => e[0] === k)?.[1] || k;
   const zoneLabel = (k?: string) => ZONE_LABELS.find(z => z[0] === k)?.[1] || "Без акцента";
   const [theme, setThemeState] = useState(getTheme());
@@ -27,6 +29,16 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
     if (i < 0 || j < 0 || j >= navOrder.length) return;
     const next = [...navOrder]; [next[i], next[j]] = [next[j], next[i]];
     applyNav(next);
+  };
+  const applyQA = (ids: QuickActionId[]) => { saveQuickActions(ids); onQuickActionsChange(ids); };
+  const toggleQA = (id: QuickActionId) => {
+    applyQA(quickActions.includes(id) ? quickActions.filter(x => x !== id) : [...quickActions, id]);
+  };
+  const moveQA = (id: QuickActionId, dir: -1 | 1) => {
+    const i = quickActions.indexOf(id); const j = i + dir;
+    if (i < 0 || j < 0 || j >= quickActions.length) return;
+    const next = [...quickActions]; [next[i], next[j]] = [next[j], next[i]];
+    applyQA(next);
   };
   const toggle = async (k: keyof User) => { const u = await api.settings({ [k]: !user[k] }); setUser(u); };
   const time = async (v: string) => { const u = await api.settings({ workout_time: v }); setUser(u); };
@@ -58,7 +70,7 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
   const Sw = ({ l, k }: { l: string; k: keyof User }) => <div className="toggle"><span>{l}</span><button className={`sw ${user[k] ? "on" : ""}`} onClick={() => toggle(k)} aria-label={l} /></div>;
   return (
     <div className="screen fade">
-      <Hero>
+      <Hero img={profileHero}>
         <div className="row" style={{ gap: 14 }}>
           {user.photo_url && <img src={user.photo_url} style={{ width: 56, height: 56, borderRadius: 18, border: "2px solid rgba(255,255,255,.5)" }} />}
           <div><h1 className="display" style={{ margin: 0, fontSize: 28 }}>{user.first_name}</h1>{user.username && <div style={{ opacity: .85 }}>@{user.username}</div>}</div>
@@ -115,6 +127,29 @@ export default function Profile({ user, setUser, onRedo, onLogout, navOrder, onN
             <div key={item.id} className="toggle">
               <span style={{ color: "var(--muted)" }}>{item.label}</span>
               <button className="btn ghost sm" onClick={() => toggleNavItem(item.id)}>Показать</button>
+            </div>
+          ))}
+        </div>
+      </Card>
+      <div className="eyebrow" style={{ margin: "18px 0 8px" }}>Быстрые действия на главном</div>
+      <Card className="glass">
+        <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 12 }}>Переставь порядок стрелками, добавь или убери — можно скрыть все</div>
+        <div className="stack">
+          {quickActions.length === 0 && <div style={{ fontSize: 13, color: "var(--muted)" }}>Сейчас на главном экране блока «Быстрые действия» нет</div>}
+          {quickActions.map((id, i) => { const item = QUICK_ACTION_ITEMS.find(q => q.id === id)!; return (
+            <div key={id} className="toggle">
+              <span>{item.label}</span>
+              <div className="row" style={{ gap: 6 }}>
+                <button className="btn ghost sm" disabled={i === 0} onClick={() => moveQA(id, -1)}>↑</button>
+                <button className="btn ghost sm" disabled={i === quickActions.length - 1} onClick={() => moveQA(id, 1)}>↓</button>
+                <button className="btn ghost sm" onClick={() => toggleQA(id)}>Убрать</button>
+              </div>
+            </div>
+          ); })}
+          {QUICK_ACTION_ITEMS.filter(q => !quickActions.includes(q.id)).map(item => (
+            <div key={item.id} className="toggle">
+              <span style={{ color: "var(--muted)" }}>{item.label}</span>
+              <button className="btn ghost sm" onClick={() => toggleQA(item.id)}>Добавить</button>
             </div>
           ))}
         </div>

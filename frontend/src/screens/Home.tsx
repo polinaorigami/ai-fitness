@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Btn, Card, Stat, Hero, greet, ActionIcon } from "../components/UI";
 import { Today, User, ProgramT } from "../api";
 import { haptic } from "../tg";
+import { QUICK_ACTION_ITEMS, QuickActionId } from "../quickActionsPrefs";
+import homeHero from "../assets/hero/home.webp";
 
 const DURATIONS: [number, string][] = [
   [5, "Разминка"], [10, "Короткая"], [20, "Оптимальная"],
@@ -21,7 +23,13 @@ function QuickAction({ icon, label, onClick }: { icon: string; label: string; on
   );
 }
 
-export default function Home({ user, today, program, onStart, onDuration, go }: { user: User; today: Today; program: ProgramT; onStart: (dayIndex: number) => void; onShort: () => void; onDuration: (minutes: number) => void; go: (t: string) => void }) {
+// Экраны-цели для «быстрых действий» без специальной обработки — просто go(id).
+const QA_GO_TARGET: Partial<Record<QuickActionId, string>> = {
+  friends: "friends", workout: "workout", schedule: "schedule", progress: "progress", achievements: "achievements",
+  stretch: "mind", meditation: "mind", breathing: "mind",
+};
+
+export default function Home({ user, today, program, onStart, onDuration, go, quickActions }: { user: User; today: Today; program: ProgramT; onStart: (dayIndex: number) => void; onShort: () => void; onDuration: (minutes: number) => void; go: (t: string) => void; quickActions: QuickActionId[] }) {
   const d = today.day;
   const [showTime, setShowTime] = useState(false);
   const [busyMin, setBusyMin] = useState<number | null>(null);
@@ -30,9 +38,13 @@ export default function Home({ user, today, program, onStart, onDuration, go }: 
     haptic(); setBusyMin(m);
     try { await onDuration(m); } catch { setBusyMin(null); setShowTime(false); }
   };
+  const runQuickAction = (id: QuickActionId) => {
+    if (id === "music") window.dispatchEvent(new CustomEvent("aifitness:open-music"));
+    else go(QA_GO_TARGET[id] || "home");
+  };
   return (
     <div className="screen fade">
-      <Hero>
+      <Hero img={homeHero}>
         <div className="row between" style={{ alignItems: "flex-start" }}>
           <div><div className="eyebrow">AI FITNESS</div><h1 className="display" style={{ fontSize: 26, margin: "6px 0 0" }}>{greet()}, {user.first_name} 👋</h1></div>
           {user.photo_url && <img src={user.photo_url} style={{ width: 44, height: 44, borderRadius: 14, border: "2px solid rgba(255,255,255,.5)" }} />}
@@ -60,13 +72,16 @@ export default function Home({ user, today, program, onStart, onDuration, go }: 
           </>
         )}
       </Hero>
-      <div className="eyebrow" style={{ margin: "18px 0 10px" }}>Быстрые действия</div>
-      <div className="grid2" style={{ marginBottom: 20, gap: 10 }}>
-        <QuickAction icon="stretch" label="Растяжка" onClick={() => go("mind")} />
-        <QuickAction icon="meditation" label="Медитация" onClick={() => go("mind")} />
-        <QuickAction icon="breathing" label="Дыхание" onClick={() => go("mind")} />
-        <QuickAction icon="music" label="Музыка" onClick={() => window.dispatchEvent(new CustomEvent("aifitness:open-music"))} />
-      </div>
+      {quickActions.length > 0 && <>
+        <div className="eyebrow" style={{ margin: "18px 0 10px" }}>Быстрые действия</div>
+        <div className="grid2" style={{ marginBottom: 20, gap: 10 }}>
+          {quickActions.map(id => {
+            const item = QUICK_ACTION_ITEMS.find(q => q.id === id);
+            if (!item) return null;
+            return <QuickAction key={id} icon={item.icon} label={item.label} onClick={() => runQuickAction(id)} />;
+          })}
+        </div>
+      </>}
       <div className="eyebrow" style={{ margin: "8px 0 10px" }}>Твой прогресс</div>
       <div className="grid2" style={{ marginBottom: 14 }}>
         <Stat v={<>🔥 {today.streak}</>} l="серия тренировок" />

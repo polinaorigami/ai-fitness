@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Btn, Card, Hero, IconBtn, Loading, Err, fmtMin } from "../components/UI";
+import friendsHero from "../assets/hero/friends.webp";
 import { api, User, FriendsData, FriendInviteT, FriendMsg, FriendBrief, RecentSession } from "../api";
 import { haptic, notify } from "../tg";
 
@@ -113,7 +114,7 @@ export default function Friends({ user }: { user: User }) {
 
   return (
     <div className="screen fade">
-      <Hero>
+      <Hero img={friendsHero}>
         <div className="eyebrow">ДРУЗЬЯ</div>
         <h1 className="display" style={{ fontSize: 26, margin: "6px 0 0" }}>Твоя сеть</h1>
       </Hero>

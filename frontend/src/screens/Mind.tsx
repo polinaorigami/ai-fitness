@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Btn, Card, Hero } from "../components/UI";
+import mindHero from "../assets/hero/mind.webp";
 
 interface MindSession {
   id: string;
@@ -336,7 +337,7 @@ export default function Mind() {
   // Главный экран Mind
   return (
     <div className="screen fade">
-      <Hero>
+      <Hero img={mindHero}>
         <div className="eyebrow">MIND</div>
         <h1 className="display" style={{ fontSize: 26, margin: "6px 0 16px" }}>Отдохни 🧘</h1>
         <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
