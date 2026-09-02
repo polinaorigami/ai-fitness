@@ -364,7 +364,8 @@ function Chat({ friend, onBack }: { friend: FriendBrief; onBack: () => void }) {
           style={{ flexShrink: 0, width: 52, height: 52, borderRadius: 14, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6.5 6.5l11 11" /><path d="M4 8l2.5-2.5L9 8l-2.5 2.5z" /><path d="M15 15l2.5-2.5L20 15l-2.5 2.5z" /><path d="M4 4l2 2M18 18l2 2" /></svg>
         </button>
-        <input placeholder="Сообщение…" value={text} onChange={e => setText(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} />
+        <input placeholder="Сообщение…" value={text} onChange={e => setText(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
+          style={{ flex: 1, minWidth: 0 }} />
         <button className="btn accent sm" style={{ height: 52, width: 52 }} onClick={send} disabled={sending || !text.trim()}>→</button>
       </div>
 
