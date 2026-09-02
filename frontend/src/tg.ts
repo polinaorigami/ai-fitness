@@ -36,8 +36,21 @@ export function setMode(m: ThemeMode) {
   applyTelegramTheme();
 }
 
+// Реальная видимая высота (visualViewport), не layout-высота: на Android при появлении
+// клавиатуры layout-viewport не меняется, а fixed-элементы (нижние шторки/модалки) продолжают
+// позиционироваться по нему — из-за этого низ шторки уезжает под клавиатуру. CSS-переменная
+// --vvh даёт актуальную высоту, которую используют такие оверлеи (.sheet-overlay) вместо 100vh.
+function setVvh() {
+  const h = window.visualViewport?.height ?? window.innerHeight;
+  document.documentElement.style.setProperty("--vvh", `${h}px`);
+}
+
 export function initTelegram() {
   applyTelegramTheme();
+  setVvh();
+  window.visualViewport?.addEventListener("resize", setVvh);
+  window.visualViewport?.addEventListener("scroll", setVvh);
+  window.addEventListener("resize", setVvh);
   if (!tg) {
     window.matchMedia?.("(prefers-color-scheme: dark)").addEventListener?.("change", applyTelegramTheme);
     return;

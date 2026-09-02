@@ -400,20 +400,14 @@ export default function MusicWidget() {
         onPointerCancel={onPointerUp}
         onClick={toggleExpanded}
         aria-label="Плеер"
+        className="icon-btn"
         style={{
           width: SIZE,
           height: SIZE,
-          borderRadius: "50%",
-          border: "none",
           cursor: dragging ? "grabbing" : "grab",
           position: "relative",
-          background: expanded ? "var(--accent)" : "var(--card)",
-          color: expanded ? "var(--accent-ink)" : "var(--ink)",
-          boxShadow: "var(--shadow)",
+          ...(expanded ? { background: "var(--accent)", color: "var(--accent-ink)", borderColor: "var(--accent)" } : {}),
           fontSize: 18,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
           touchAction: "none",
         }}
       >

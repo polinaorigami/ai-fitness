@@ -228,7 +228,7 @@ export default function Friends({ user }: { user: User }) {
 
       {/* Добавить друга — bottom sheet */}
       {showAdd && (
-        <div onClick={() => setShowAdd(false)} style={{ position: "fixed", inset: 0, background: "var(--sheet-scrim)", display: "flex", alignItems: "flex-end", zIndex: 100 }}>
+        <div onClick={() => setShowAdd(false)} className="sheet-overlay">
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderRadius: "20px 20px 0 0", padding: 24, paddingBottom: "calc(24px + var(--safe-b))", animation: "rise .3s ease" }}>
             <div style={{ textAlign: "center", marginBottom: 18 }}>
               <h2 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 700 }}>Добавить друга</h2>
@@ -379,7 +379,7 @@ function Chat({ friend, onBack }: { friend: FriendBrief; onBack: () => void }) {
 
       {/* Поделиться тренировкой — bottom sheet */}
       {showShare && (
-        <div onClick={() => setShowShare(false)} style={{ position: "fixed", inset: 0, background: "var(--sheet-scrim)", display: "flex", alignItems: "flex-end", zIndex: 100 }}>
+        <div onClick={() => setShowShare(false)} className="sheet-overlay">
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderRadius: "20px 20px 0 0", padding: 24, paddingBottom: "calc(24px + var(--safe-b))", maxHeight: "70vh", overflowY: "auto", animation: "rise .3s ease" }}>
             <div style={{ textAlign: "center", marginBottom: 18 }}>
               <h2 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 700 }}>Поделиться тренировкой</h2>
