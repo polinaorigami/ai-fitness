@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Btn, Card, Hero, IconBtn, Loading, Err, fmtMin } from "../components/UI";
 import friendsHero from "../assets/hero/friends.webp";
 import { api, User, FriendsData, FriendInviteT, FriendMsg, FriendBrief, RecentSession } from "../api";
@@ -226,8 +227,10 @@ export default function Friends({ user }: { user: User }) {
         </>
       )}
 
-      {/* Добавить друга — bottom sheet */}
-      {showAdd && (
+      {/* Добавить друга — bottom sheet. Портал в document.body: .screen.fade имеет активную
+          CSS-анимацию transform/opacity, а значит создаёт свой stacking context — вложенный
+          в него z-index:100 не может подняться выше соседней .nav (z-index:50) вне .screen. */}
+      {showAdd && createPortal(
         <div onClick={() => setShowAdd(false)} className="sheet-overlay">
           <div onClick={e => e.stopPropagation()} className="sheet-card" style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderRadius: "20px 20px 0 0", padding: 24, paddingBottom: "calc(24px + var(--safe-b))", animation: "rise .3s ease" }}>
             <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
@@ -244,7 +247,8 @@ export default function Friends({ user }: { user: User }) {
               <Btn kind="accent" onClick={addFriend} disabled={!code.trim() || adding} style={{ flex: 1 }}>{adding ? "…" : "Добавить"}</Btn>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Toast */}
@@ -379,8 +383,9 @@ function Chat({ friend, onBack }: { friend: FriendBrief; onBack: () => void }) {
         <button className="btn accent sm" style={{ height: 52, width: 52 }} onClick={send} disabled={sending || !text.trim()}>→</button>
       </div>
 
-      {/* Поделиться тренировкой — bottom sheet */}
-      {showShare && (
+      {/* Поделиться тренировкой — bottom sheet. Портал в document.body для консистентности
+          с остальными шторками — не зависит от того, есть ли у родителя своя анимация transform. */}
+      {showShare && createPortal(
         <div onClick={() => setShowShare(false)} className="sheet-overlay">
           <div onClick={e => e.stopPropagation()} className="sheet-card" style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderRadius: "20px 20px 0 0", padding: 24, paddingBottom: "calc(24px + var(--safe-b))", animation: "rise .3s ease" }}>
             <div style={{ textAlign: "center", marginBottom: 18 }}>
@@ -408,7 +413,8 @@ function Chat({ friend, onBack }: { friend: FriendBrief; onBack: () => void }) {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

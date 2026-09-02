@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { Btn, Card, Stat, Hero, greet, ActionIcon } from "../components/UI";
 import { Today, User, ProgramT } from "../api";
 import { haptic } from "../tg";
@@ -92,8 +93,11 @@ export default function Home({ user, today, program, onStart, onDuration, go, qu
       <div style={{ height: 12 }} />
       <Btn kind="soft" onClick={() => go("coach")}>Мой AI-тренер</Btn>
 
-      {/* Выбор длительности тренировки */}
-      {showTime && (
+      {/* Выбор длительности тренировки — портал в document.body: иначе шторка наследует
+          stacking context от .screen.fade (у него активная CSS-анимация transform/opacity,
+          а любой элемент с анимируемым transform создаёт свой stacking context) и её
+          z-index:100 не может подняться выше соседней .nav (z-index:50) вне .screen. */}
+      {showTime && createPortal(
         <div onClick={() => !busyMin && setShowTime(false)} className="sheet-overlay">
           <div onClick={e => e.stopPropagation()} className="sheet-card" style={{ width: "100%", maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderRadius: "20px 20px 0 0", padding: 24, paddingBottom: "calc(24px + var(--safe-b))", animation: "rise .3s ease" }}>
             <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
@@ -113,7 +117,8 @@ export default function Home({ user, today, program, onStart, onDuration, go, qu
             </div>
             <Btn kind="ghost" onClick={() => setShowTime(false)} disabled={busyMin !== null} style={{ marginTop: 12 }}>Отмена</Btn>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
