@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
   <title>AI FITNESS</title>
   <meta name="theme-color" content="#0B0B0D" />
+  <!-- Без этого тега Android WebView (внутри Telegram) может включить свой
+       принудительный "Force Dark" для нативных полей ввода и перекрасить их
+       в сплошной чёрный прямоугольник поверх наших CSS-цветов. Явное
+       объявление color-scheme на уровне HTML отключает эту эвристику. -->
+  <meta name="color-scheme" content="light dark" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />

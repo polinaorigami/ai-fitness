@@ -343,7 +343,7 @@ function Chat({ friend, onBack }: { friend: FriendBrief; onBack: () => void }) {
           <Avatar f={friend} size={32} />
         </div>
       </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8, padding: "12px 0" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8, padding: "12px 0 calc(84px + var(--safe-b))" }}>
         {loading ? <div style={{ color: "var(--muted)", textAlign: "center", marginTop: 20 }}>Загрузка…</div>
           : msgs.length === 0 ? (
             <div style={{ textAlign: "center", color: "var(--muted)", marginTop: 40 }}>
@@ -359,7 +359,11 @@ function Chat({ friend, onBack }: { friend: FriendBrief; onBack: () => void }) {
           ))}
         <div ref={endRef} />
       </div>
-      <div className="row" style={{ position: "sticky", bottom: "var(--safe-b)", background: "var(--bg)", paddingTop: 8, gap: 8 }}>
+      {/* position:fixed (не sticky) — тот же приём, что и у нижней навигации (.nav):
+          на Android при появлении клавиатуры sticky-элемент внутри flex-колонки может
+          "уехать" за пределы видимой (сжатой клавиатурой) области. fixed относительно
+          viewport работает предсказуемо и здесь уже проверено на .nav. */}
+      <div className="row" style={{ position: "fixed", left: 0, right: 0, bottom: 0, maxWidth: 480, margin: "0 auto", background: "var(--bg)", borderTop: "1px solid var(--line)", padding: "10px 18px calc(10px + var(--safe-b))", gap: 8, zIndex: 60 }}>
         <button onClick={openShare} aria-label="Поделиться тренировкой"
           style={{ flexShrink: 0, width: 52, height: 52, borderRadius: 14, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6.5 6.5l11 11" /><path d="M4 8l2.5-2.5L9 8l-2.5 2.5z" /><path d="M15 15l2.5-2.5L20 15l-2.5 2.5z" /><path d="M4 4l2 2M18 18l2 2" /></svg>
